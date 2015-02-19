@@ -34,6 +34,7 @@ class Tree$Test extends Specification {
     "find the depth of a tree" in {
       depth(simpleTree) === 3
       depth(bsTree) === 4
+      depth(unbalancedTree) === 4
     }
 
     " map a function over a tree" in {
@@ -64,7 +65,15 @@ class Tree$Test extends Specification {
     "discover whether a tree is balanced" in {
 
       isBalanced(simpleTree) === true
-      isBalanced(bsTree) === false
+      isBalanced(bsTree) === true
+      isBalanced(unbalancedTree) === false
+    }
+
+    "discover whether a tree is complete" in {
+
+      isFull(simpleTree) === true
+      isFull(bsTree) === false
+      isFull(unbalancedTree) === false
     }
   }
 }
@@ -111,4 +120,25 @@ object SampleTrees {
       Branch(8,
         Leaf(7),
         Leaf(9)))
-}
+
+  /*
+  *         1
+  *       /   \
+  *      2    6
+  *     / \
+  *    3  4
+  *   /
+  *  5
+  *
+  * */
+
+  lazy val unbalancedTree =
+    Branch(1,
+    Branch(2,
+      Branch(3,
+        Leaf(5),
+        Empty()),
+      Leaf(4)),
+    Leaf(6))
+
+ }

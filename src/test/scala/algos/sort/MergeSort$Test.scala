@@ -1,10 +1,13 @@
-package algos
+package algos.sort
 
 import org.specs2.mutable.Specification
 
 /**
- * Created by aguestuser on 1/24/15.
+ * Author: @aguestuser
+ * Date: 1/24/15
+ * License: GPLv2
  */
+
 class MergeSort$Test extends Specification {
 
   "MergeSort#sort" should {

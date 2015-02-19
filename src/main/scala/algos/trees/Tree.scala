@@ -38,12 +38,38 @@ object Tree {
     case Leaf(v) => Leaf(fn(v))
     case Branch(v,l,r) => Branch(fn(v), map(l)(fn), map(r)(fn)) }
 
-  def fold(tr: Tree)(fn: Int => Int): Int = ???
+//  def fold(tr: Tree)(fn: Int => Int): Int = ???
 
   def isBalanced(tr: Tree): Boolean = tr match {
+    case Empty() => true
+    case Leaf(_) => true
+    case Branch(_,l,r) => Math.abs(depth(l) - depth(r)) <= 1 && isBalanced(l) && isBalanced(r)
+  }
+
+  def isFull(tr: Tree): Boolean = tr match {
     case Empty() => false
     case Leaf(_) => true
-    case Branch(_,l,r) => isBalanced(l) && isBalanced(r) }
+    case Branch(_,l,r) => isFull(l) && isFull(r)
+  }
+
+  def isPerfect(tr: Tree): Boolean = tr match {
+    case Branch(_,l,r) => isFull(tr) && depth(l) == depth(r)
+  }
+
+  def isComplete(tr: Tree): Boolean = tr match {
+    case Empty() => false
+    case Leaf(_) => true
+    case Branch(_,l,r) => depth(l) - depth(r) <= 1 && isComplete(l) && isComplete(r)
+  }
+
+//  def highestComplete(tr: Tree): Tree =
+//
+//    doHighestComplete(tr, tr)._1
+//
+//    def doHighestComplete(curr: Tree, highest: Tree): (Tree,Tree) = curr match {
+//      case Branch(_,l,r) =>
+//    }
+//  }
 
 }
 
