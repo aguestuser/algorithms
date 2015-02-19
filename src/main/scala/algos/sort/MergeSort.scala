@@ -1,5 +1,7 @@
 package algos.sort
 
+import scala.annotation.tailrec
+
 /**
  * Author: @aguestuser
  * Date: 1/24/15
@@ -8,18 +10,26 @@ package algos.sort
 
 object MergeSort {
 
-  def sort(ints: Array[Int]) : Array[Int] = ints match { // log n steps
-    case Array() => Array()
-    case Array(i) => Array(i)
-    case arr =>
-      val piv = arr.size/2
-      merge(sort(arr.slice(0, piv)), sort(arr.slice(piv, arr.size))) // this is where the dividing happens
-  }
+  type Ints = Vector[Int]
 
-  private def merge(lft: Array[Int], rt: Array[Int]) : Array[Int] = (lft,rt) match { // n steps (will get called from sort log n times)
-    case (Array(), r) => r
-    case (l, Array()) => l
-    case (l,r) if l.head <= r.head => l.head +: merge(l.tail, r)
-    case (l,r) if r.head < l.head => r.head +: merge(l, r.tail)
-  }
+  def sort(ints: Ints) : Ints = ints match { // log n steps
+    case Vector() => Vector()
+    case Vector(i) => Vector(i)
+    case arr =>
+      merge(sort(arr.slice(0, arr.size/2)), sort(arr.slice(arr.size/2, arr.size))) }
+
+  private def merge(left: Ints, right: Ints) : Ints = {
+
+    @tailrec
+    def loop(lft: Ints, rt: Ints, acc: Ints): (Ints, Ints, Ints) =
+      (lft,rt) match {
+        case (Vector(),Vector()) => (Vector(), Vector(),acc)
+        case (Vector(), r) => (Vector(), Vector(), acc ++ r)
+        case (l, Vector()) => (Vector(), Vector(), acc ++ l)
+        case (l,r) =>
+          if (l.head <= r.head) loop(l.tail, r, acc :+ l.head )
+          else loop(l, r.tail, acc :+ r.head) }
+
+    loop(left,right,Vector())._3 }
+
 }

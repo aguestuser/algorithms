@@ -14,13 +14,18 @@ class CountInversions$Test extends Specification {
 
   "Inversions module" should {
 
-    "find the number of inversions in an array of ints" in {
+    "count inversions in a vector of ints" in {
 
-      countInversions(Array(1,2,3)) === 0
-      countInversions(Array(1,3,5,2,4,6)) === 3
-      countInversions(Array(3,2,1,6,5,4)) === 6
-      countInversions(Array(3,2,6,1,5,4)) === 7
+      countInversions(Vector(1,2,3)) === 0
+      countInversions(Vector(1,3,5,2,4,6)) === 3
+      countInversions(Vector(3,2,1,6,5,4)) === 6
+      countInversions(Vector(3,2,6,1,5,4)) === 7
+    }
 
+    "count inversions in a vector of 100,000 ints" in {
+
+      lazy val ints: Vector[Int] = io.Source.fromFile("src/test/resources/LotsOfInts.txt").getLines().map(_.toInt).toVector
+      countInversions(ints) === 2407905288L
 
     }
   }
