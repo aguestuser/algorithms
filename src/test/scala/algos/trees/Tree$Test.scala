@@ -17,29 +17,29 @@ class Tree$Test extends Specification {
   "Tree module" should {
 
     "count the nodes in a tree" in {
-      count(simpleTree) === 7
-      count(bsTree) === 10
+      count(perfectTree) === 7
+      count(binarySearchTree) === 10
     }
 
     "sum the nodes in a tree" in {
-      sum(simpleTree) === 28
-      sum(bsTree) === 55
+      sum(perfectTree) === 28
+      sum(binarySearchTree) === 55
     }
 
     "find the max value in a tree" in {
-      maximum(simpleTree) === 7
-      maximum(bsTree) === 10
+      maximum(perfectTree) === 7
+      maximum(binarySearchTree) === 10
     }
 
     "find the depth of a tree" in {
-      depth(simpleTree) === 3
-      depth(bsTree) === 4
-      depth(unbalancedTree) === 4
+      height(perfectTree) === 3
+      height(binarySearchTree) === 4
+      height(unbalancedIncompleteTree) === 4
     }
 
     " map a function over a tree" in {
 
-      Tree.map { simpleTree } { _ * 2 } ===
+      Tree.map { perfectTree } { _ * 2 } ===
         Branch(2,
           Branch(4,
             Leaf(6),
@@ -48,7 +48,7 @@ class Tree$Test extends Specification {
             Leaf(12),
             Leaf(14)))
 
-      Tree.map { bsTree } { _ * 2 } ===
+      Tree.map { binarySearchTree } { _ * 2 } ===
         Branch(20,
           Branch(8,
             Branch(6,
@@ -64,16 +64,35 @@ class Tree$Test extends Specification {
 
     "discover whether a tree is balanced" in {
 
-      isBalanced(simpleTree) === true
-      isBalanced(bsTree) === true
-      isBalanced(unbalancedTree) === false
+      isBalanced(perfectTree) === true
+      isBalanced(binarySearchTree) === true
+      isBalanced(unbalancedIncompleteTree) === false
+      isBalanced(balancedIncompleteTree) === true
+    }
+
+    "discover whether a tree is full" in {
+
+      isFull(perfectTree) === true
+      isFull(binarySearchTree) === false
+      isFull(unbalancedIncompleteTree) === false
     }
 
     "discover whether a tree is complete" in {
 
-      isFull(simpleTree) === true
-      isFull(bsTree) === false
-      isFull(unbalancedTree) === false
+      isComplete(perfectTree) === true
+      isComplete(unbalancedIncompleteTree) === false
+      isComplete(balancedIncompleteTree) === false
+      isComplete(completeImperfectTree) === true
+    }
+
+    "find the height of the largest complete subtree of a tree" in {
+
+      largestComplete(perfectTree) === 3
+      largestComplete(balancedIncompleteTree) === 4
+      largestComplete(unbalancedIncompleteTree) === 1
+      largestComplete(balancedIncompleteTree) === 4
+      largestComplete(completeImperfectTree) === 3
+
     }
   }
 }
@@ -88,7 +107,7 @@ object SampleTrees {
   *      3  4 6  7
   * */
 
-  lazy val simpleTree =
+  lazy val perfectTree =
     Branch(1,
       Branch(2,
         Leaf(3),
@@ -108,7 +127,7 @@ object SampleTrees {
   *
   *
   * */
-  lazy val bsTree =
+  lazy val binarySearchTree =
     Branch(10,
       Branch(4,
         Branch(3,
@@ -125,20 +144,64 @@ object SampleTrees {
   *         1
   *       /   \
   *      2    6
-  *     / \
-  *    3  4
+  *     /
+  *    3
   *   /
   *  5
   *
   * */
 
-  lazy val unbalancedTree =
+  lazy val unbalancedIncompleteTree =
     Branch(1,
     Branch(2,
       Branch(3,
         Leaf(5),
         Empty()),
-      Leaf(4)),
+      Empty()),
     Leaf(6))
+  
+  /*
+  * 
+  *               1
+  *            /     \
+  *           2       3
+  *         /   \    / \
+  *       4     5   6  7
+  *      / \   / \
+  *     8  9  10 11
+  *    / \
+  *  12  13
+  * 
+  * */
+  
+  lazy val balancedIncompleteTree =
+    Branch(1,
+      Branch(2,
+        Branch(4,
+          Leaf(8),
+          Leaf(9)),
+        Branch(5,
+          Leaf(10),
+          Leaf(11))),
+      Branch(3,
+        Leaf(6),
+        Leaf(7)))
+
+  /*
+  *
+  *              1
+  *            /   \
+  *           2     3
+  *          / \
+  *         4  5
+  *
+  * */
+
+  lazy val completeImperfectTree =
+    Branch(1,
+      Branch(2,
+        Leaf(4),
+        Leaf(5)),
+      Leaf(3))
 
  }
