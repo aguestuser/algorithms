@@ -10,24 +10,26 @@ import scala.annotation.tailrec
 
 object MergeSort {
 
-  type Ints = Vector[Int]
+//  type Ints = Vector[Int]
+//  type IntPair = (Int,Int)
+//  type IntPairs = Vector[IntPair]
 
-  def sort(ints: Ints) : Ints = ints match { // log n steps
+  def sort[A](as: Vector[A])(implicit o: Ordering[A]) : Vector[A] = as match { // log n steps
     case Vector() => Vector()
     case Vector(i) => Vector(i)
-    case arr =>
-      merge(sort(arr.slice(0, arr.size/2)), sort(arr.slice(arr.size/2, arr.size))) }
+    case v =>
+      merge(sort(v.slice(0, v.size/2)), sort(v.slice(v.size/2, v.size)))(o) }
 
-  private def merge(left: Ints, right: Ints) : Ints = {
+  private def merge[A](left: Vector[A], right: Vector[A])(o: Ordering[A]) : Vector[A] = {
 
     @tailrec
-    def loop(lft: Ints, rt: Ints, acc: Ints): (Ints, Ints, Ints) =
+    def loop(lft: Vector[A], rt: Vector[A], acc: Vector[A]): (Vector[A], Vector[A], Vector[A]) =
       (lft,rt) match {
         case (Vector(),Vector()) => (Vector(), Vector(),acc)
         case (Vector(), r) => (Vector(), Vector(), acc ++ r)
         case (l, Vector()) => (Vector(), Vector(), acc ++ l)
         case (l,r) =>
-          if (l.head <= r.head) loop(l.tail, r, acc :+ l.head )
+          if (o.compare(l.head,r.head) <= 0) loop(l.tail, r, acc :+ l.head )
           else loop(l, r.tail, acc :+ r.head) }
 
     loop(left,right,Vector())._3 }

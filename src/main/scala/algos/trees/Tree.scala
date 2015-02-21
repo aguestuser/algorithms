@@ -49,7 +49,7 @@ object Tree {
       val (lBal, lHt) = checkBalanced(l)
       val (rBal, rHt) = checkBalanced(r)
       if (!lBal || !rBal) (false, 0)
-      else (Math.abs(lHt - rHt) <= 1, 1 + (lHt max rHt) }
+      else (Math.abs(lHt - rHt) <= 1, 1 + (lHt max rHt)) }
 
   def isComplete(tree: Tree): Boolean = checkComplete(tree)._1
   def largestComplete(tree: Tree): Int = checkComplete(tree)._2

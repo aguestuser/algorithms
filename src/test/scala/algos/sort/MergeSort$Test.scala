@@ -1,6 +1,7 @@
 package algos.sort
 
 import algos.sort.MergeSort._
+import algos.points._
 
 import org.specs2.mutable.Specification
 
@@ -32,6 +33,20 @@ class MergeSort$Test extends Specification {
       lazy val expected = io.Source.fromFile("src/test/resources/LotsOfIntsSorted.txt").getLines().map(_.toInt).toVector
 
       sort(ints) === expected
+    }
+
+    "sort a vector of Points by x coordinate" in {
+
+      lazy val xUnsorted = Vector(Point(3,4),Point(2,5),Point(1,6))
+
+      sort(xUnsorted)(XOrdering) === Vector(Point(1,6),Point(2,5),Point(3,4))
+
+    }
+
+    "short a vector of Points by Y coordinate" in {
+
+      lazy val yUnsorted = Vector(Point(1,6),Point(2,5),Point(3,4))
+      sort(yUnsorted)(YOrdering) === Vector(Point(3,4),Point(2,5),Point(1,6))
     }
   }
 }
