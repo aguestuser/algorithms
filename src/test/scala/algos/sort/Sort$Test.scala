@@ -35,10 +35,18 @@ class Sort$Test extends Specification {
       mSort(ints) === expected
     }
 
+    "sort a list of 100,000 ints in O(n log n) time" in pending {
+
+      lazy val worstCaseInts = (1 to 100000).toList.reverse
+      lazy val growth = timeGrowth(worstCaseInts, mSort[Int])
+
+      isNLogN(growth) === true
+      isQuadratic(growth) === false
+    }
+
     "sort a list of Points by x coordinate" in {
 
       lazy val xUnsorted = List(Point(3,4),Point(2,5),Point(1,6))
-
       mSort(xUnsorted)(XOrdering) === List(Point(1,6),Point(2,5),Point(3,4))
 
     }
