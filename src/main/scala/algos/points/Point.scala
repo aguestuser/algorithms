@@ -1,6 +1,6 @@
 package algos.points
 
-import algos.sort.MergeSort._
+import algos.sort.Sort._
 import scala.annotation.tailrec
 
 /**
@@ -21,7 +21,7 @@ object YOrdering extends Ordering[Point] {
 object Point {
 
   type P = Point
-  type Ps = Vector[Point]
+  type Ps = List[Point]
 
   def distance(ps: (P,P)): Double = ps match {
     case (p1,p2) =>
@@ -32,8 +32,8 @@ object Point {
     val (distP,distQ) = (distance(ps), distance(qs))
     if (distP < distQ) (ps,distP) else (qs,distQ) }
 
-  def closestPair(ps: Set[P]) = closestPair(ps.toVector)
-  def closestPair(ps: Ps) = closestPair(sort(ps)(XOrdering), sort(ps)(YOrdering))
+  def closestPair(ps: Set[P]): (P,P) = closestPair(ps.toList)
+  def closestPair(ps: Ps): (P,P) = closestPair(mSort(ps)(XOrdering), mSort(ps)(YOrdering))
   def closestPair(pX: Ps, pY: Ps) : (P,P) = {
 
     // TODO add base case!
@@ -50,12 +50,12 @@ object Point {
   private def split(ps: Ps, pivot: Int): ((Ps,Ps)) = {
     @tailrec
     def loop(ps: Ps, splitPs:(Ps,Ps)): (Ps,(Ps,Ps)) = ps match {
-      case (Vector()) => (ps,splitPs)
+      case Nil => (ps,splitPs)
       case _ =>
         splitPs match { case(lY,rY) =>
           if (ps.head.x <= pivot) loop(ps.tail, (lY :+ ps.head, rY))
           else loop(ps.tail, (lY, rY :+ ps.head)) } }
-    loop(ps,(Vector(),Vector())) match { case (_,(lY,rY)) => (lY,rY) } }
+    loop(ps,(List(),List())) match { case (_,(lY,rY)) => (lY,rY) } }
 
   private def closestSplitPair(pX: Ps, pY: Ps, dist: Double): (P,P) = {
     val x_ = pX((pX.size/2)-1).x
