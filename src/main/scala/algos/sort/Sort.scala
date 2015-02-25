@@ -28,22 +28,18 @@ object Sort {
         case (l, r) =>
           merge(mSort(l), mSort(r), Nil).reverse } } }
 
-  def timeGrowth[A](l: List[A], fn: List[A] => List[A]): List[(Int,Long)] = {
-    val intervals = (0 to 50).map(_ * l.size / 50).toList
-    intervals map { i =>
-      val sub = l.take(i)
-      val elapsed = time(sub,fn)
-      println(s"$i, $elapsed")
-      (i,elapsed) } }
+  def dutchFlagify[A](l: List[A])(implicit o: Ordering[A]): List[A] = l match {
+    case Nil => List()
+    case _ =>
+      val pivot = l(l.size/2)
+      ((List[A](),List[A](),List[A]()) /: l)((acc,i) =>
+        acc match { case(lt,eq,gt) =>
+          if (o.compare(i,pivot) < 0) (i::lt,eq,gt)
+          else if (o.compare(i,pivot) < 0) (lt,eq,i::gt)
+          else (lt,i::eq,gt)}) match { case(lt,gt,eq) =>
+        lt ::: gt ::: eq } }
 
-  def time[A](l: List[A], fn: List[A] => List[A]): Long = {
-    System.gc()
-    val start = System.nanoTime
-    fn(l)
-    (System.nanoTime - start) / 1000 /*to millis*/ }
 
-  def isLinear(growth: List[(Int,Long)]): Boolean = ???
-  def isNLogN(growth: List[(Int,Long)]): Boolean = ???
-  def isQuadratic(growth: List[(Int,Long)]): Boolean = ???
+
 
 }

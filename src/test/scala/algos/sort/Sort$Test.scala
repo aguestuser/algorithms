@@ -2,6 +2,7 @@ package algos.sort
 
 import algos.sort.Sort._
 import algos.points._
+import algos.benchmark.Benchmark._
 
 import org.specs2.mutable.Specification
 
@@ -12,6 +13,8 @@ import org.specs2.mutable.Specification
  */
 
 class Sort$Test extends Specification {
+
+  lazy val worstCaseInts = (1 to 1000000).toList.reverse
 
   "merge sort" should {
 
@@ -35,12 +38,9 @@ class Sort$Test extends Specification {
       mSort(ints) === expected
     }
 
-    "sort a list of 100,000 ints in O(n log n) time" in pending {
+    "sort a list of 100,000 ints in O(n log n) time" in {
 
-      lazy val worstCaseInts = (1 to 100000).toList.reverse
       lazy val growth = timeGrowth(worstCaseInts, mSort[Int])
-
-      isNLogN(growth) === true
       isQuadratic(growth) === false
     }
 
@@ -57,4 +57,33 @@ class Sort$Test extends Specification {
       mSort(yUnsorted)(YOrdering) === List(Point(3,4),Point(2,5),Point(1,6))
     }
   }
+
+  "dutchFlagify" should {
+
+    "sort a list into halves around a pivot" in {
+
+      dutchFlagify(List(1,3,2,1,3)) === List(1,1,2,3,3)
+      dutchFlagify(List(1,3,1,2,3)) === List(1,1,2,3,3)
+      dutchFlagify(List(1,3,3,2,1)) === List(1,1,2,3,3)
+      dutchFlagify(List(4,3,3,2,1)) === List(1,2,3,3,4)
+    }
+
+    "run in linear time" in pending {
+      // plotGrowth(worstCaseInts,dutchFlagify[Int])
+      isLinear(timeGrowth(worstCaseInts, dutchFlagify[Int])) === true
+
+    }
+  }
+
+  "halve" should {
+
+    "run in linear time" in {
+
+      def addOne(l: List[Int]): List[Int] = l.map(_+1)
+
+      plotGrowth(worstCaseInts,addOne)
+      isLinear(timeGrowth(worstCaseInts, addOne)) === true
+    }
+  }
+
 }
