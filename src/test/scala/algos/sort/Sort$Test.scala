@@ -6,6 +6,8 @@ import algos.benchmark.Benchmark._
 
 import org.specs2.mutable.Specification
 
+import scala.collection.mutable.ArrayBuffer
+
 /**
  * Author: @aguestuser
  * Date: 1/24/15
@@ -58,6 +60,42 @@ class Sort$Test extends Specification {
     }
   }
 
+  "fqSort" should {
+
+    "sort an even-sized list of ints" in {
+      fqSort(List(5,4,3,2,1)) === List(1,2,3,4,5)
+    }
+    "sort an odd-sized list of ints" in {
+      fqSort(List(4,3,2,1)) === List(1,2,3,4)
+    }
+
+    "sort a list of ints with duplicates" in {
+      fqSort(List(5,5,3,3,1,1)) === List(1,1,3,3,5,5)
+    }
+
+    "sort a large list of ints" in {
+
+      lazy val ints = io.Source.fromFile("src/test/resources/LotsOfInts.txt").getLines().map(_.toInt).toList
+      lazy val expected = io.Source.fromFile("src/test/resources/LotsOfIntsSorted.txt").getLines().map(_.toInt).toList
+
+      fqSort(ints) === expected
+    }
+
+    "run in O(n log n)" in {
+
+      plotGrowth(worstCaseInts,fqSort[Int]) === List((1,1))
+    }
+
+  }
+
+  "imperative quick sort" should {
+
+    "sort a list of ints" in {
+      iqSort(ArrayBuffer(8,7,6,5,4,3,2,1)) === ArrayBuffer(1,2,3,4,5,6,7,8)
+    }
+
+  }
+
   "dutchFlagify" should {
 
     "sort a list into halves around a pivot" in {
@@ -69,8 +107,8 @@ class Sort$Test extends Specification {
     }
 
     "run in linear time" in pending {
-      // plotGrowth(worstCaseInts,dutchFlagify[Int])
-      isLinear(timeGrowth(worstCaseInts, dutchFlagify[Int])) === true
+      plotGrowth(worstCaseInts,dutchFlagify[Int]) === List(1,1)
+//      isLinear(timeGrowth(worstCaseInts, dutchFlagify[Int])) === true
 
     }
   }
