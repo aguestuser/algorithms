@@ -1,5 +1,7 @@
 package algos.benchmark
 
+import scala.collection.mutable.ArrayBuffer
+
 /**
  * Author: @aguestuser
  * Date: 2/25/15
@@ -8,21 +10,23 @@ package algos.benchmark
 
 object Benchmark {
 
-  def plotGrowth[A](l: List[A], fn: List[A] => List[A]): List[(Int,Long)] = {
-    val intervals = (0 to 50).map(_ * l.size / 50).toList
+  def plotGrowthA[A](l: ArrayBuffer[A], fn: ArrayBuffer[A] => ArrayBuffer[A]): Boolean = {
+    val intervals = (0 to 50).map(_ * l.size / 50)
     intervals map { i =>
       val sub = l.take(i)
       val elapsed = time(sub,fn)
-      println(s"$i, $elapsed")
-      (i,elapsed) } }
+      println(s"$i, $elapsed") }
+    true }
 
-  def timeGrowth[A](l: List[A], fn: List[A] => List[A]): List[Double] = {
-    val intervals = (0 to 50).map(_ * l.size / 50).toList
+  def plotGrowthL[A](l: List[A], fn: List[A] => List[A]): Boolean = {
+    val intervals = (0 to 50).map(_ * l.size / 50)
     intervals map { i =>
       val sub = l.take(i)
-      time(sub,fn).toDouble } }
+      val elapsed = time(sub,fn)
+      println(s"$i, $elapsed") }
+    true }
 
-  def time[A](l: List[A], fn: List[A] => List[A]): Long = {
+  def time[A,T[B] <: Seq[B]](l: T[A], fn: T[A] => T[A]): Long = {
     System.gc()
     val start = System.nanoTime
     fn(l)
@@ -41,5 +45,23 @@ object Benchmark {
   def isQuadratic(growth: List[Double]): Boolean = isLinear(growth.map(Math.sqrt))
 
 //  def isNLogN(growth: List[Long]): Boolean = ???
+
+  //  def plotGrowth[A,T[B] <: Seq[B]](l: T[A], fn: T[A] => T[A]): Boolean = {
+  //    val intervals = (0 to 50).map(_ * l.size / 50)
+  //    intervals map { i =>
+  //      val sub = l.take(i)
+  //      System.gc()
+  //      val start = System.nanoTime
+  //      val elapsed = (System.nanoTime - start)
+  //      println(s"$i, $elapsed") }
+  //    true }
+
+  //  def plotGrowthDumb[A,T[B] <: Seq[B]](l: T[A], fn: T[A] => T[A]): Boolean = {
+  //    val intervals = (0 to 50).map(_ * l.size / 50)
+  //    intervals map { i =>
+  //      val sub = l.take(i)
+  //      val elapsed = time(sub,fn)
+  //      println(s"$i, $elapsed") }
+  //    true }
 
 }

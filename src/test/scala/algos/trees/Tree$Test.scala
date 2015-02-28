@@ -205,3 +205,4 @@ object SampleTrees {
       Leaf(3))
 
  }
+

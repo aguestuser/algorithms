@@ -1,9 +1,7 @@
 package algos.sort
 
-import algos.sort.Sort._
 import algos.points._
-import algos.benchmark.Benchmark._
-
+import algos.sort.Sort._
 import org.specs2.mutable.Specification
 
 import scala.collection.mutable.ArrayBuffer
@@ -16,7 +14,8 @@ import scala.collection.mutable.ArrayBuffer
 
 class Sort$Test extends Specification {
 
-  lazy val worstCaseInts = (1 to 1000000).toList.reverse
+  lazy val worstCaseInts = (100000 to 1 by -1).toList
+  lazy val worstCaseIntsArr = (ArrayBuffer[Int]() /: (100000 to 1 by -1))(_:+_)
 
   "merge sort" should {
 
@@ -38,12 +37,6 @@ class Sort$Test extends Specification {
       lazy val expected = io.Source.fromFile("src/test/resources/LotsOfIntsSorted.txt").getLines().map(_.toInt).toList
 
       mSort(ints) === expected
-    }
-
-    "sort a list of 100,000 ints in O(n log n) time" in {
-
-      lazy val growth = timeGrowth(worstCaseInts, mSort[Int])
-      isQuadratic(growth) === false
     }
 
     "sort a list of Points by x coordinate" in {
@@ -80,48 +73,23 @@ class Sort$Test extends Specification {
 
       fqSort(ints) === expected
     }
-
-    "run in O(n log n)" in {
-
-      plotGrowth(worstCaseInts,fqSort[Int]) === List((1,1))
-    }
-
   }
 
   "imperative quick sort" should {
 
-    "sort a list of ints" in {
+    "sort an array of ints" in {
       iqSort(ArrayBuffer(8,7,6,5,4,3,2,1)) === ArrayBuffer(1,2,3,4,5,6,7,8)
     }
+    "sort an array of ints with duplicates" in {
+      iqSort(ArrayBuffer(4,3,3,2,2,1)) === ArrayBuffer(1,2,2,3,3,4)
+    }
+    "sort a large array of ints" in {
+      lazy val ints = (ArrayBuffer[Int]() /: io.Source.fromFile("src/test/resources/LotsOfInts.txt").getLines().map(_.toInt))(_:+_)
+      lazy val expected = (ArrayBuffer[Int]() /: io.Source.fromFile("src/test/resources/LotsOfIntsSorted.txt").getLines().map(_.toInt))(_:+_)
 
-  }
-
-  "dutchFlagify" should {
-
-    "sort a list into halves around a pivot" in {
-
-      dutchFlagify(List(1,3,2,1,3)) === List(1,1,2,3,3)
-      dutchFlagify(List(1,3,1,2,3)) === List(1,1,2,3,3)
-      dutchFlagify(List(1,3,3,2,1)) === List(1,1,2,3,3)
-      dutchFlagify(List(4,3,3,2,1)) === List(1,2,3,3,4)
+      iqSort(ints) === expected
     }
 
-    "run in linear time" in pending {
-      plotGrowth(worstCaseInts,dutchFlagify[Int]) === List(1,1)
-//      isLinear(timeGrowth(worstCaseInts, dutchFlagify[Int])) === true
-
-    }
-  }
-
-  "halve" should {
-
-    "run in linear time" in {
-
-      def addOne(l: List[Int]): List[Int] = l.map(_+1)
-
-      plotGrowth(worstCaseInts,addOne)
-      isLinear(timeGrowth(worstCaseInts, addOne)) === true
-    }
   }
 
 }

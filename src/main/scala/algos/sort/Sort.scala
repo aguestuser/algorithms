@@ -39,14 +39,14 @@ object Sort {
         sort(l, pp - 1); sort(pp + 1, r) } }
 
     def partition(p: Int, l: Int, r: Int): Int = {
-      val piv = as(p); swap(p,l)
+      val piv = as(p); swap(p,l); var i = l+1
       @tailrec
-      def partitionOne(i: Int, ll: Int, rr: Int): Int = {
-        if (ll > rr) { swap(i-1,l); i-1 }
+      def partitionOne(i: Int, ll: Int): Int = {
+        if (ll > r) { swap(i-1,l); i-1 }
         else {
-          val newI = if (o.compare(as(ll),piv) < 0){swap(ll, i); i+1} else i
-          partitionOne(newI,ll+1,rr) } }
-      partitionOne(l+1,l+1,r) }
+          val newI = if (o.compare(as(ll),piv) < 0){ swap(ll, i); i+1 } else i
+          partitionOne(newI,ll+1) } }
+      partitionOne(l+1,l+1) }
 
     def choosePivot(l: Int, r: Int): Int = (l + r) / 2
     def swap(i: Int, j: Int) { val t = as(i); as(i) = as(j); as(j) = t }
@@ -63,22 +63,6 @@ object Sort {
         as.filter(o.compare(_,p) == 0),
         fqSort(as.filter(o.compare(_,p) > 0))) }
 
-
   def choosePivot[A](as: List[A]): A = as(as.size/2)
-
-
-  def dutchFlagify[A](l: List[A])(implicit o: Ordering[A]): List[A] = l match {
-    case Nil => List()
-    case _ =>
-      val pivot = l(l.size/2)
-      ((List[A](),List[A](),List[A]()) /: l)((acc,i) =>
-        acc match { case(lt,eq,gt) =>
-          if (o.compare(i,pivot) < 0) (i::lt,eq,gt)
-          else if (o.compare(i,pivot) < 0) (lt,eq,i::gt)
-          else (lt,i::eq,gt)}) match { case(lt,gt,eq) =>
-        lt ::: gt ::: eq } }
-
-
-
 
 }
