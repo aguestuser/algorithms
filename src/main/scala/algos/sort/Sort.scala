@@ -39,14 +39,12 @@ object Sort {
         sort(l, pp - 1); sort(pp + 1, r) } }
 
     def partition(p: Int, l: Int, r: Int): Int = {
-      val piv = as(p); swap(p,l); var i = l+1
-      @tailrec
-      def partitionOne(i: Int, ll: Int): Int = {
-        if (ll > r) { swap(i-1,l); i-1 }
-        else {
-          val newI = if (o.compare(as(ll),piv) < 0){ swap(ll, i); i+1 } else i
-          partitionOne(newI,ll+1) } }
-      partitionOne(l+1,l+1) }
+      val piv = as(p); swap(p,l)
+      var i = l+1; var ll = l+1
+      while(ll <= r) {
+        if (o.compare(as(ll),piv) < 0){ swap(ll, i); i = i+1 }
+        ll = ll + 1}
+      swap(i-1,l); i-1 }
 
     def choosePivot(l: Int, r: Int): Int = (l + r) / 2
     def swap(i: Int, j: Int) { val t = as(i); as(i) = as(j); as(j) = t }
@@ -65,4 +63,15 @@ object Sort {
 
   def choosePivot[A](as: List[A]): A = as(as.size/2)
 
+
+//  def partition(p: Int, l: Int, r: Int): Int = {
+//    val piv = as(p); swap(p,l)
+//    val piv = as(p); swap(p,l)
+//    @tailrec
+//    def partitionOne(i: Int, ll: Int): Int = {
+//      if (ll > r) { swap(i-1,l); i-1 }
+//      else {
+//        val newI = if (o.compare(as(ll),piv) < 0){ swap(ll, i); i+1 } else i
+//        partitionOne(newI,ll+1) } }
+//    partitionOne(l+1,l+1) }
 }
