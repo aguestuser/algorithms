@@ -2,8 +2,10 @@ package algos.sort
 
 import algos.points._
 import algos.sort.Sort._
+
 import org.specs2.mutable.Specification
 
+import Math.{random}
 import scala.collection.mutable.ArrayBuffer
 
 /**
@@ -16,10 +18,15 @@ class Sort$Test extends Specification {
 
   lazy val wcl = (1000000 to 1 by -1).toList
   lazy val sl = (1 to 1000000).toList
+  lazy val rl = (1 to 1000000).map(_ => random * 1000000).toList
+
   lazy val wcv = wcl.toVector
   lazy val sv = sl.toVector
+  lazy val rv = rl.toVector
+
   lazy val wcab = ArrayBuffer(wcl: _*)
   lazy val sab = ArrayBuffer(sl: _*)
+  lazy val rab = ArrayBuffer(rl: _*)
 
   //TODO add test for sorting list of 1,000,000 random ints
 

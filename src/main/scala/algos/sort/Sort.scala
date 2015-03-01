@@ -50,7 +50,6 @@ object Sort {
           merge(mSortV(l), mSortV(r), Vector[A]()) } } }
 
   //imperative quicksort
-
   def qSort[A](as: ArrayBuffer[A])(implicit o: Ordering[A]): ArrayBuffer[A] = {
 
     def sort(l: Int, r: Int): ArrayBuffer[A] = {
@@ -70,7 +69,6 @@ object Sort {
           partitionOne(newI,ll+1,rr) } }
       partitionOne(l+1,l+1,r) }
 
-//    def choosePivot(l: Int, r: Int): Int = (l + r) / 2
     def choosePivot(l: Int, r: Int): Int = l + (random * (abs(l-r)+1)).toInt
     def swap(i: Int, j: Int) { val t = as(i); as(i) = as(j); as(j) = t }
 
@@ -98,9 +96,7 @@ object Sort {
 //        ll = ll + 1}
 //      swap(i-1,l); i-1 }
 
-
-//imperative version:
-
+//tail recursive version:
 //    def partition(p: Int, l: Int, r: Int): Int = {
 //      val piv = as(p); swap(p,l)
 //      @tailrec
