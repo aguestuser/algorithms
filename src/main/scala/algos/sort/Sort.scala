@@ -3,6 +3,7 @@ package algos.sort
 import java.lang.Math.{abs, random}
 
 import scala.annotation.tailrec
+import scala.collection.SeqLike
 import scala.collection.mutable.ArrayBuffer
 
 /**
@@ -84,6 +85,23 @@ object Sort {
         qSortL(as.filter(o.compare(_,p) < 0)),
         as.filter(o.compare(_,p) == 0),
         qSortL(as.filter(o.compare(_,p) > 0))) }
+
+  // property test
+  def didSort[A, T[B] <: SeqLike[B, T[B]]](c1: T[A], c2: T[A])(implicit o: Ordering[A]): Boolean = {
+
+    def sameSet(c1: T[A], c2: T[A]): Boolean = c1.toSet == c2.toSet
+    def sameSize(c1: T[A], c2: T[A]): Boolean = c1.size == c2.size
+    //    def correctBounds(c1: T[A], c2: T[A]): Boolean = c1.min == c2.head && c2.max == c2(c2.size-1)
+    def ordered(c: T[A]): Boolean = {
+      @tailrec
+      def loop(lastRes: Boolean, lastA: A, as: T[A]): Boolean = as.size match {
+        case 0 => lastRes
+        case _ =>
+          if (!lastRes) false
+          else loop(lastRes && (o.compare(lastA,as.head) <= 0), as.head, as.tail) }
+      loop(lastRes=true,c.head,c.tail) }
+
+    sameSet(c1,c2) && sameSize(c1,c2) && /*correctBounds(c1,c2) &&*/ ordered(c2) }
 
 }
 

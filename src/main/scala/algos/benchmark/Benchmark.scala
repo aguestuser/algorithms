@@ -2,6 +2,7 @@ package algos.benchmark
 
 import scala.collection.SeqLike
 
+
 /**
  * Author: @aguestuser
  * Date: 2/25/15
@@ -25,7 +26,6 @@ object Benchmark {
       val elapsed = time(sub,fn)
       println(s"$i, $elapsed") }
     true }
-
 
   def delta(a: Double, b: Double): Double = Math.abs((a-b)/a)
 
