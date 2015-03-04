@@ -5,7 +5,7 @@ import algos.sort.Sort._
 
 import org.specs2.mutable.Specification
 
-import Math.{random}
+import Math.random
 import scala.collection.mutable.ArrayBuffer
 
 /**
@@ -28,8 +28,6 @@ class Sort$Test extends Specification {
   lazy val sab = ArrayBuffer(sl: _*)
   lazy val rab = ArrayBuffer(rl: _*)
 
-  //TODO add test for sorting list of 1,000,000 random ints
-
   "didSort" should {
 
     "correctly identify the properties of a sorted output given an unsorted input" in {
@@ -39,6 +37,18 @@ class Sort$Test extends Specification {
       didSort(List(1,2,3),List(2,1,3)) === false // ordering
     }
   }
+
+//  "countCompares" should {
+//
+//    lazy val ints = ArrayBuffer(io.Source.fromFile("src/test/resources/QuickSortSampleInts.txt").getLines.map(_.toInt).toSeq: _*)
+//    // always choose first: 162085
+//    // always choose last: 164123
+//    // choose median of first, middle, last: 138382
+//    // choose randomly: 155544, 146886,
+//    "get correct count" in {
+//      countCompares[Int](ints) === 138382
+//    }
+//  }
 
   "merge sort on a list" should {
 
@@ -140,7 +150,21 @@ class Sort$Test extends Specification {
     "sort a list of 10,000 random ints" in {
       didSort(rl,qSortL(rl)) === true
     }
+  }
 
+  "functional random select" should {
 
+    "select the kth biggest element in a list of distinct ints" in {
+      rSelect(List(6,1,2,5,4,3), 2) === 2
+      rSelect(List(6,1,2,5,4,3), 3) === 3
+      rSelect(List(6,1,2,5,4,3), 6) === 6
+    }
+  }
+
+  "imperative random select" should {
+
+    "select the kth biggest element in an array of distinct ints" in {
+      rSelectA(ArrayBuffer(6,1,2,5,4,3),4) === 4
+    }
   }
 }
