@@ -31,7 +31,7 @@ object Sort {
           merge(mSort(l), mSort(r), Nil).reverse } } }
 
   //merge sort on vectors
-  def mSortV[A](as: Vector[A])(implicit o: Ordering[A]): Vector[A] = {
+  def mSort[A](as: Vector[A])(implicit o: Ordering[A]): Vector[A] = {
     @tailrec
     def merge(l: Vector[A], r: Vector[A], acc: Vector[A]): Vector[A] = (l, r) match {
       case (Vector(), _) => acc ++ r
@@ -44,7 +44,7 @@ object Sort {
       case Vector(i) => Vector[A](i)
       case lst => lst.splitAt(lst.size / 2) match {
         case (l, r) =>
-          merge(mSortV(l), mSortV(r), Vector[A]()) } } }
+          merge(mSort(l), mSort(r), Vector[A]()) } } }
 
   //imperative quicksort
   def qSort[A](as: ArrayBuffer[A])(implicit o: Ordering[A]): ArrayBuffer[A] = {
@@ -57,7 +57,7 @@ object Sort {
     sort(0,as.size-1); as }
 
   //imperative random select
-  def rSelectA[A](as: ArrayBuffer[A], k: Int)(implicit o: Ordering[A]): A = {
+  def rSelect[A](as: ArrayBuffer[A], k: Int)(implicit o: Ordering[A]): A = {
     @tailrec
     def select(l: Int, r: Int, ki: Int): A = {
       if (l > r) throw new Exception("Can't access an array of negative length")
@@ -69,7 +69,7 @@ object Sort {
     select(0,as.size-1,k-1) }
 
 
-  // imperative partitioning helpers
+  // imperative partition helpers
   def partition[A](as: ArrayBuffer[A], p: Int, l: Int, r: Int)(implicit o: Ordering[A]): Int = {
     val piv = as(p); swap(as,p,l)
     @tailrec
@@ -83,17 +83,16 @@ object Sort {
   def choosePivot[A](l: Int, r: Int): Int = l + (random * (abs(l-r)+1)).toInt
   def swap[A](as: ArrayBuffer[A], i: Int, j: Int) { val t = as(i); as(i) = as(j); as(j) = t }
 
-
   //functional quicksort
-  def qSortL[A](as: List[A])(implicit o: Ordering[A]): List[A] = as match {
+  def qSort[A](as: List[A])(implicit o: Ordering[A]): List[A] = as match {
     case Nil => List()
     case List(a) => as
     case _ =>
       val p = choosePivot(as)
       val (lt,eq,gt) = partition(as, p)
-      qSortL(lt); qSortL(gt) }
+      qSort(lt) ::: eq ::: qSort(gt) }
 
-  // functional random select
+  // functional random select (on top of quicksort)
   def rSelect[A](as: List[A], k: Int)(implicit o: Ordering[A]): A = {
     @tailrec
     def select(aas: List[A], ki: Int): A = aas match {
@@ -101,31 +100,29 @@ object Sort {
       case List(i) => i
       case _ =>
         val p = choosePivot(aas)
-        val (lt,_,gt) = partition(aas,p)
-        if (lt.size == ki) p else if (lt.size > ki) select(lt,ki) else select(gt,ki-lt.size-1) }
+        val (lt,eq,gt) = partition(aas,p)
+        if (lt.size <= ki && ki < lt.size+eq.size) p
+        else if (lt.size > ki) select(lt,ki)
+        else select(gt, ki-(lt.size + eq.size)) }
     select(as,k-1) }
 
   // functional partition helpers
   def choosePivot[A](as: List[A]) = as((random * as.size).toInt)
   def partition[A](as: List[A], p: A)(implicit o: Ordering[A]): (List[A],List[A],List[A]) =
-    (as.filter(o.lt(_,p)), as.filter(o.eq(_,p)), as.filter(o.gt(_,p)))
+    (as.filter(o.lt(_,p)), as.filter(o.equiv(_,p)), as.filter(o.gt(_,p)))
 
   // property test
   def didSort[A, T[B] <: SeqLike[B, T[B]]](c1: T[A], c2: T[A])(implicit o: Ordering[A]): Boolean = {
-
     def sameSet(c1: T[A], c2: T[A]): Boolean = c1.toSet == c2.toSet
     def sameSize(c1: T[A], c2: T[A]): Boolean = c1.size == c2.size
-    //    def correctBounds(c1: T[A], c2: T[A]): Boolean = c1.min == c2.head && c2.max == c2(c2.size-1)
     def ordered(c: T[A]): Boolean = {
       @tailrec
       def loop(lastRes: Boolean, lastA: A, as: T[A]): Boolean = as.size match {
         case 0 => lastRes
         case _ =>
-          if (!lastRes) false
-          else loop(lastRes && (o.compare(lastA,as.head) <= 0), as.head, as.tail) }
+          if (!lastRes) false else loop(lastRes && o.lteq(lastA,as.head), as.head, as.tail) }
       loop(lastRes=true,c.head,c.tail) }
-
-    sameSet(c1,c2) && sameSize(c1,c2) && /*correctBounds(c1,c2) &&*/ ordered(c2) }
+    sameSet(c1,c2) && sameSize(c1,c2) && ordered(c2) }
 
 }
 

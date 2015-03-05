@@ -86,23 +86,23 @@ class Sort$Test extends Specification {
   "merge sort on a vector" should {
 
     "sort an even-numbered vector of distinct ints" in {
-      mSortV(Vector(8,4,2,7,6,1,3,5)) === Vector(1,2,3,4,5,6,7,8)
+      mSort(Vector(8,4,2,7,6,1,3,5)) === Vector(1,2,3,4,5,6,7,8)
     }
 
     "sort an odd-numbered vector of distinct ints" in {
-      mSortV(Vector(8,4,2,7,9,6,1,3,5)) === Vector(1,2,3,4,5,6,7,8,9)
+      mSort(Vector(8,4,2,7,9,6,1,3,5)) === Vector(1,2,3,4,5,6,7,8,9)
     }
 
     "sort an vector of ints with duplicates" in {
-      mSortV(Vector(4,4,2,2,6,1,3,5)) === Vector(1,2,2,3,4,4,5,6)
+      mSort(Vector(4,4,2,2,6,1,3,5)) === Vector(1,2,2,3,4,4,5,6)
     }
 
     "sort a vector of 1,000,000 ints" in {
-      mSortV(wcv) === sv
+      mSort(wcv) === sv
     }
 
     "sort a vector of 10,000 random ints" in {
-      didSort(rv,mSortV(rv)) === true
+      didSort(rv,mSort(rv)) === true
     }
   }
 
@@ -132,23 +132,23 @@ class Sort$Test extends Specification {
   "functional quick sort on a list" should {
 
     "sort an even-numbered list of distinct ints" in {
-      qSortL(List(8,4,2,7,6,1,3,5)) === List(1,2,3,4,5,6,7,8)
+      qSort(List(8,4,2,7,6,1,3,5)) === List(1,2,3,4,5,6,7,8)
     }
 
     "sort an odd-numbered list of distinct ints" in {
-      qSortL(List(8,4,2,7,9,6,1,3,5)) === List(1,2,3,4,5,6,7,8,9)
+      qSort(List(8,4,2,7,9,6,1,3,5)) === List(1,2,3,4,5,6,7,8,9)
     }
 
     "sort an list of ints with duplicates" in {
-      qSortL(List(4,4,2,2,6,1,3,5)) === List(1,2,2,3,4,4,5,6)
+      qSort(List(4,4,2,2,6,1,3,5)) === List(1,2,2,3,4,4,5,6)
     }
 
     "sort a list of 1,000,000 ints" in {
-      qSortL(wcl) === sl
+      qSort(wcl) === sl
     }
 
     "sort a list of 10,000 random ints" in {
-      didSort(rl,qSortL(rl)) === true
+      didSort(rl,qSort(rl)) === true
     }
   }
 
@@ -158,13 +158,28 @@ class Sort$Test extends Specification {
       rSelect(List(6,1,2,5,4,3), 2) === 2
       rSelect(List(6,1,2,5,4,3), 3) === 3
       rSelect(List(6,1,2,5,4,3), 6) === 6
+      rSelect(wcl,500) === 500
+    }
+
+    "select the kth biggest element in a list of ints w/ dups" in {
+      rSelect(List(4,5,3,2,1,2),2) === 2
+      rSelect(List(4,5,3,2,1,2),3) === 2
     }
   }
 
   "imperative random select" should {
 
     "select the kth biggest element in an array of distinct ints" in {
-      rSelectA(ArrayBuffer(6,1,2,5,4,3),4) === 4
+      rSelect(ArrayBuffer(6,1,2,5,4,3), 2) === 2
+      rSelect(ArrayBuffer(6,1,2,5,4,3), 3) === 3
+      rSelect(ArrayBuffer(6,1,2,5,4,3), 6) === 6
+      rSelect(ArrayBuffer(10,5,0),2) === 5
+      rSelect(ArrayBuffer(10,5,0),1) === 0
+      rSelect(ArrayBuffer(10,5,0),3) === 10
+    }
+    "select the kth biggest element in an array of ints w/ dups" in {
+      rSelect(ArrayBuffer(4,5,3,2,1,2),2) === 2
+      rSelect(ArrayBuffer(4,5,3,2,1,2),3) === 2
     }
   }
 }
