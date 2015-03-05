@@ -1,6 +1,7 @@
 package algos.benchmark
 
 import scala.collection.SeqLike
+import scala.math.random
 
 
 /**
@@ -26,6 +27,21 @@ object Benchmark {
       val elapsed = time(sub,fn)
       println(s"$i, $elapsed") }
     true }
+
+  def plotGrowthWithK[A, T[B] <: SeqLike[B, T[B]]]
+  (l: T[A], fn: (T[A],Int) => A): Boolean = {
+    val intervals = (0 to 50).map(_ * l.size / 50)
+    intervals map { i =>
+      val sub = l.take(i)
+      val k = (random*i).toInt
+      System.gc()
+      val start = System.nanoTime
+      fn(l,k)
+      val elapsed = (System.nanoTime - start) / 1000
+      println(s"$i, $elapsed") }
+    true }
+
+
 
   def delta(a: Double, b: Double): Double = Math.abs((a-b)/a)
 

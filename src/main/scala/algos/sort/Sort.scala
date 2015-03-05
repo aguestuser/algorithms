@@ -1,7 +1,7 @@
 package algos.sort
 
-import java.lang.Math.{abs, random}
 
+import scala.math.{abs,random}
 import scala.annotation.tailrec
 import scala.collection.SeqLike
 import scala.collection.mutable.ArrayBuffer
@@ -14,7 +14,7 @@ import scala.collection.mutable.ArrayBuffer
 
 object Sort {
 
-  // merge sort on lists
+  // merge sort on list
   def mSort[A](as: List[A])(implicit o: Ordering[A]): List[A] = {
     @tailrec
     def merge(l: List[A], r: List[A], acc: List[A]): List[A] = (l, r) match {
@@ -30,7 +30,7 @@ object Sort {
         case (l, r) =>
           merge(mSort(l), mSort(r), Nil).reverse } } }
 
-  //merge sort on vectors
+  // merge sort on vector
   def mSort[A](as: Vector[A])(implicit o: Ordering[A]): Vector[A] = {
     @tailrec
     def merge(l: Vector[A], r: Vector[A], acc: Vector[A]): Vector[A] = (l, r) match {
@@ -46,7 +46,7 @@ object Sort {
         case (l, r) =>
           merge(mSort(l), mSort(r), Vector[A]()) } } }
 
-  //imperative quicksort
+  // imperative quicksort
   def qSort[A](as: ArrayBuffer[A])(implicit o: Ordering[A]): ArrayBuffer[A] = {
     def sort(l: Int, r: Int): Unit = {
       if (l < r) {
@@ -56,7 +56,7 @@ object Sort {
         sort(pp + 1, r) } }
     sort(0,as.size-1); as }
 
-  //imperative random select
+  // imperative random select
   def rSelect[A](as: ArrayBuffer[A], k: Int)(implicit o: Ordering[A]): A = {
     @tailrec
     def select(l: Int, r: Int, ki: Int): A = {
@@ -83,7 +83,7 @@ object Sort {
   def choosePivot[A](l: Int, r: Int): Int = l + (random * (abs(l-r)+1)).toInt
   def swap[A](as: ArrayBuffer[A], i: Int, j: Int) { val t = as(i); as(i) = as(j); as(j) = t }
 
-  //functional quicksort
+  // functional quicksort
   def qSort[A](as: List[A])(implicit o: Ordering[A]): List[A] = as match {
     case Nil => List()
     case List(a) => as

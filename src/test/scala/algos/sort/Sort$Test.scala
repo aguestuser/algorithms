@@ -5,7 +5,7 @@ import algos.sort.Sort._
 
 import org.specs2.mutable.Specification
 
-import Math.random
+import scala.math.random
 import scala.collection.mutable.ArrayBuffer
 
 /**
@@ -18,7 +18,7 @@ class Sort$Test extends Specification {
 
   lazy val wcl = (1000000 to 1 by -1).toList
   lazy val sl = (1 to 1000000).toList
-  lazy val rl = (1 to 10000).map(_ => (random * 1000000).toInt).toList
+  lazy val rl = List.fill(1000000)((random * 1000000).toInt)
 
   lazy val wcv = wcl.toVector
   lazy val sv = sl.toVector
