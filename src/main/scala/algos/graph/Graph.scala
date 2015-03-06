@@ -1,6 +1,6 @@
 package algos.graph
 
-import algos.graph.Edge._
+import scala.math.random
 
 /**
  * Author: @aguestuser
@@ -8,13 +8,15 @@ import algos.graph.Edge._
  * License: GPLv2
  */
 
-case class Graph[A](vs: Vector[Vertex[A]], es: Vector[Edge[A]])
+
 case class Vertex[A](a: A, adj: List[A])
 case class Edge[A](u: A, v: A)
+case class Graph[A](vs: Vector[Vertex[A]], es: Vector[Edge[A]])
 
-object Graph {
+object G {
 
-  def construct[A](vs: Vector[Vertex[A]]): Graph[A] = Graph(vs,edges(vs))
+  def construct[A](vs: Vector[Vertex[A]])(implicit o: Ordering[A]): Graph[A] =
+    Graph(vs,E.edges(vs))
 
   def add[A](g: Graph[A], v: Vertex[A]): Graph[A] = {
     val es = v.adj.zipWithIndex map { case(a,i) => Edge(a,v.a) }
@@ -25,6 +27,15 @@ object Graph {
     val (ui, vi) = (g.vs.indexOf(u), g.vs.indexOf(v))
     val ee = Edge(uu.a, vv.a)
     Graph[A](g.vs.updated(ui, uu).updated(vi, vv), g.es :+ ee) }
+
+  def randomContract[A](g: Graph[A])(implicit o: Ordering[A]) =
+    contract(g)((random * g.vs.size).toInt,(random * g.vs.size).toInt)
+
+  def contract[A](g: Graph[A])(i: Int, j: Int)(implicit o: Ordering[A]) = {
+    val (vi,vj) = (g.vs(i),g.vs(j))
+    val (vii) = Vertex(vi.a, vi.adj ::: vj.adj)
+    val vs = g.vs.updated(i, vii).filter(_.a != vj.a)
+    Graph[A](vs,E.edges(vs)) }
 
   def sizes[A](g: Graph[A]): (Int,Int) = (g.vs.size, g.es.size)
   def size[A](g: Graph[A]): Int = sizes(g) match { case(m,n) => m+n }
@@ -37,13 +48,13 @@ object Graph {
 
 }
 
-object Vertex {
+object V {
   def deg[A](v: Vertex[A]): Int = v.adj.size
   def connected[A](u: Vertex[A], v: Vertex[A]): Boolean = u.adj.contains(v)
 }
 
 
-object Edge {
+object E {
 
   def edges[A](vs: Vector[Vertex[A]])(implicit o: Ordering[A]): Vector[Edge[A]] =
     vs.flatMap(v => v.adj.toVector.map(a => (v.a,a)))
