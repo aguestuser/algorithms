@@ -21,7 +21,7 @@ object Sort {
       case (Nil, _) => r.reverse ::: acc
       case (_, Nil) => l.reverse ::: acc
       case (_,_) =>
-        if (o.compare(l.head, r.head) <= 0) merge(l.tail, r, l.head :: acc)
+        if (o.lteq(l.head, r.head)) merge(l.tail, r, l.head :: acc)
         else merge(l, r.tail, r.head :: acc) }
     as match {
       case Nil => List()

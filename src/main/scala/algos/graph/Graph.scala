@@ -1,6 +1,6 @@
 package algos.graph
 
-import algos.sort.Sort._
+import algos.graph.Edge._
 
 /**
  * Author: @aguestuser
@@ -9,49 +9,49 @@ import algos.sort.Sort._
  */
 
 case class Graph[A](vs: Vector[Vertex[A]], es: Vector[Edge[A]])
-case class Vertex[A](i: Int, a: A, adj: List[Vertex[A]])
-case class Edge[A](i: Int, u: Vertex[A], v: Vertex[A])
-
-object gOrd extends Ordering[Graph] {def compare(f: Graph, g: Graph) = Graph.size(f) compare Graph.size(g) }
-object vOrd extends Ordering[Vertex] {
-  def compare(u: Vertex, v: Vertex) = u.i compare v.i
-}
-object eOrd extends Ordering[Edge] {
-  def compare(d: Edge, e: Edge) = d.i compare e.i
-  override def equiv(d: Edge, e: Edge) =
-    d.i == e.i && ((d.u == e.u && d.v == d.v) || (d.u == e.v && d.v == d.u))
-}
+case class Vertex[A](a: A, adj: List[A])
+case class Edge[A](u: A, v: A)
 
 object Graph {
 
-  def size(g: Graph): Int = ???
-  
-  def add[A](g: Graph[A], a: A, adj: List[Vertex[A]]): Graph[A] = {
-    val u = Vertex(g.vs.size, a, adj)
-    val es = adj.zipWithIndex map { case(v,i) => Edge(g.vs.size + i,u,v) }
-    Graph(g.vs :+ u, g.es ++ es) }
+  def construct[A](vs: Vector[Vertex[A]]): Graph[A] = Graph(vs,edges(vs))
+
+  def add[A](g: Graph[A], v: Vertex[A]): Graph[A] = {
+    val es = v.adj.zipWithIndex map { case(a,i) => Edge(a,v.a) }
+    Graph[A](g.vs :+ v, g.es ++ es) }
 
   def connect[A](g: Graph[A], u: Vertex[A], v: Vertex[A]): Graph[A] = {
-    val (uu,vv) = (Vertex(u.i, u.a, v :: u.adj), Vertex(v.i, v.a, u :: v.adj))
-    val ee = Edge(g.es.size, uu, vv)
-    Graph(g.vs.updated(u.i, uu).updated(v.i, vv), g.es.updated(ee.i, ee)) }
+    val (uu,vv) = (Vertex(u.a, v.a :: u.adj), Vertex(v.a, u.a :: v.adj))
+    val (ui, vi) = (g.vs.indexOf(u), g.vs.indexOf(v))
+    val ee = Edge(uu.a, vv.a)
+    Graph[A](g.vs.updated(ui, uu).updated(vi, vv), g.es :+ ee) }
 
-  def vertex[A](g: Graph[A], i: Int): Vertex[A] = g.vs(i)
-  def hasVertex[A](g: Graph[A], v: Vertex)(implicit o: Ordering[Vertex]): Boolean =
+  def sizes[A](g: Graph[A]): (Int,Int) = (g.vs.size, g.es.size)
+  def size[A](g: Graph[A]): Int = sizes(g) match { case(m,n) => m+n }
 
-  def edge[A](g: Graph[A], i: Int): Edge[A] = g.es(i)
-  def hasEdge[A](g: Graph[A], v: Vertex): Boolean = ???
+  def findv[A](g: Graph[A], a: A): Option[Vertex[A]] = g.vs find { _.a == a }
+  def hasv[A](g: Graph[A], a: A): Boolean = g.vs exists { _.a == a }
+
+  def finde[A](g: Graph[A], e: Edge[A]): Option[Edge[A]] = g.es find { _ == e }
+  def hase[A](g: Graph[A], e: Edge[A]): Boolean = g.es contains { e }
 
 }
 
 object Vertex {
-  def degree(v: Vertex): Int = v.adj.size
-  def connected(u: Vertex, v: Vertex): Boolean = u.adj.contains(v)
+  def deg[A](v: Vertex[A]): Int = v.adj.size
+  def connected[A](u: Vertex[A], v: Vertex[A]): Boolean = u.adj.contains(v)
 }
-
 
 
 object Edge {
 
-  def edges[A](vs: Vector[Vertex[A]]): Vector[Edge[A]] = ???
+  def edges[A](vs: Vector[Vertex[A]])(implicit o: Ordering[A]): Vector[Edge[A]] =
+    vs.flatMap(v => v.adj.toVector.map(a => (v.a,a)))
+      .map(order(_)).distinct.map(p => Edge(p._1,p._2))
+
+  def order[A](as:(A,A))(implicit o: Ordering[A]):(A,A) = as match {
+    case(a,aa) => if (o.lteq(a,aa)) (a,aa) else (aa,a) }
+
+//  def equiv[A](e1: Edge[A], e2: Edge[A]): Boolean = (e1,e2) match {
+//    case (Edge(u1,v1),(u2,v2)) => (u1 == u2 && v1 == v2) || (u1 == v2 && v1 == u2) }
 }
