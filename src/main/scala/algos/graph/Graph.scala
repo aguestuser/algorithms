@@ -1,7 +1,5 @@
 package algos.graph
 
-import algos.graph.Vertex._
-
 import scala.annotation.tailrec
 import scala.math.random
 
@@ -11,15 +9,17 @@ import scala.math.random
  * License: GPLv2
  */
 
-
 case class Vertex[A](a: A, adj: List[A])
 case class Edge[A](u: A, v: A)
 case class Graph[A](vs: Vector[Vertex[A]], es: Vector[Edge[A]])
 
 object Graph {
 
+  import algos.graph.Vertex._
+  import algos.graph.Edge._
+
   def construct[A](vs: Vector[Vertex[A]])(implicit o: Ordering[A]): Graph[A] =
-    Graph(vs,Edge.edges(vs))
+    Graph(vs,edges(vs))
 
   def add[A](g: Graph[A], v: Vertex[A]): Graph[A] = {
     val es = v.adj.zipWithIndex map { case(a,i) => Edge(a,v.a) }
@@ -40,14 +40,14 @@ object Graph {
   def randomContract[A](g: Graph[A])(implicit o: Ordering[A]): Graph[A] = {
     val gg = contract(g, (random * g.vs.size).toInt, (random * g.vs.size).toInt)
     if (gg.vs.size <= 2) gg else randomContract(gg) }
+
   def contract[A](g: Graph[A],i: Int, j: Int)(implicit o: Ordering[A]) =
     Graph[A](contractVs(g.vs,i,j),contractEs(g.es,g.vs,i,j))
   def contractVs[A](vs: Vector[Vertex[A]], i: Int, j: Int): Vector[Vertex[A]] =
     vs updated(i,combine(vs(i),vs(j))) map { Vertex.replace(_, vs(j).a, vs(i).a) } filter { _.a != vs(j).a }
   def contractEs[A](es: Vector[Edge[A]], vs: Vector[Vertex[A]], i: Int, j: Int): Vector[Edge[A]] =
     es map { Edge.replace(_,vs(j).a,vs(i).a) } filter { { case Edge(a,b) => a != b } }
-  
-  
+
   def sizes[A](g: Graph[A]): (Int,Int) = (g.vs.size, g.es.size)
   def size[A](g: Graph[A]): Int = sizes(g) match { case(m,n) => m+n }
 
@@ -77,6 +77,4 @@ object Edge {
     e match { case Edge(u,v) => Edge(replace1(u),replace1(v)) }
   }
 
-//  def equiv[A](e1: Edge[A], e2: Edge[A]): Boolean = (e1,e2) match {
-//    case (Edge(u1,v1),(u2,v2)) => (u1 == u2 && v1 == v2) || (u1 == v2 && v1 == u2) }
 }
