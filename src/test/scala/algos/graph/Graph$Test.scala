@@ -2,6 +2,7 @@ package algos.graph
 
 import algos.graph.Graph._
 import org.specs2.mutable.Specification
+import math.log
 
 /**
  * Author: @aguestuser
@@ -95,6 +96,10 @@ class Graph$Test extends Specification {
           Vertex(4,List(1,2,3))))
     }
 
+    "tell me what i need to know" in {
+      parseTxt("src/test/resources/minCutSampleData.txt").es.size === 2517
+    }
+
     "compute the min cut of a small graph " in {
       rContractN(g,16) === 3
     }
@@ -102,7 +107,7 @@ class Graph$Test extends Specification {
     "compute the min cut of a large graph" in {
       val g1 = parseTxt("src/test/resources/minCutSampleData.txt")
       val n = sizes(g1)._1
-      rContractN(g1,n*n) === 21
+      rContractN(g1,n * n * log(n).toInt) === 21
     }
   }
 
