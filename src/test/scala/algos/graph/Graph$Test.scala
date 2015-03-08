@@ -85,6 +85,25 @@ class Graph$Test extends Specification {
     "recursively and randomly contract a graph" in {
       sizes(randomContract(g))._1 === 2
     }
+
+    "parse a graph from text input" in {
+      parseTxt("src/test/resources/sampleGraph.txt") ===
+        construct(Vector(
+          Vertex(1,List(2,3,4)),
+          Vertex(2,List(1,3,4)),
+          Vertex(3,List(1,2,4)),
+          Vertex(4,List(1,2,3))))
+    }
+
+    "compute the min cut of a small graph " in {
+      rContractN(g,16) === 3
+    }
+
+    "compute the min cut of a large graph" in {
+      val g1 = parseTxt("src/test/resources/minCutSampleData.txt")
+      val n = sizes(g1)._1
+      rContractN(g1,n*n) === 21
+    }
   }
 
 }

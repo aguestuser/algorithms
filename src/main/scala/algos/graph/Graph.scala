@@ -18,15 +18,25 @@ object Graph {
   import algos.graph.Vertex._
   import algos.graph.Edge._
 
+  // construct
   def construct[A](vs: Vector[Vertex[A]])(implicit o: Ordering[A]): Graph[A] =
     Graph(vs,edges(vs))
 
+  def parseTxt(path: String): Graph[Int] = {
+    val lines = io.Source.fromFile(path).getLines().toVector
+    val keys = lines map { _.split("""[\t|\s]+""").toList }
+    val vs = keys map { x => Vertex(x.head.toInt, x.tail.map(_.toInt)) }
+    construct(vs)
+  }
+
+  // modify vertexes
   def add[A](g: Graph[A], v: Vertex[A]): Graph[A] = {
     val es = v.adj.zipWithIndex map { case(a,i) => Edge(a,v.a) }
     Graph[A](g.vs :+ v, g.es ++ es) }
 
   def connect[A](g: Graph[A], i: Int, j: Int): Graph[A] = {
     val (vi, vj) = (g.vs(i),g.vs(j))
+    //TODO add error handling here
     val (vvi,vvj) = (Vertex(vi.a, vj.a :: vi.adj), Vertex(vj.a, vi.a :: vj.adj))
     Graph[A](g.vs.updated(i, vvi).updated(j, vvj), g.es :+ Edge(vvi.a, vvj.a)) }
   
@@ -36,6 +46,13 @@ object Graph {
       case (_,None) => g
       case (Some(u),Some(v)) => connect(g,g.vs.indexOf(u),g.vs.indexOf(v)) }
 
+  // contract
+  def rContractN[A](g: Graph[A], n: Int)(implicit o: Ordering[A]): Int = {
+    @tailrec
+    def rContract1(g: Graph[A], n: Int, min: Int): Int =
+      if (n == 0) min else rContract1(g, n-1, math.min(min,randomContract(g).es.size))
+    rContract1(g,n,g.es.size) }
+
   @tailrec
   def randomContract[A](g: Graph[A])(implicit o: Ordering[A]): Graph[A] = {
     val gg = contract(g, (random * g.vs.size).toInt, (random * g.vs.size).toInt)
@@ -43,14 +60,16 @@ object Graph {
 
   def contract[A](g: Graph[A],i: Int, j: Int)(implicit o: Ordering[A]) =
     Graph[A](contractVs(g.vs,i,j),contractEs(g.es,g.vs,i,j))
+
   def contractVs[A](vs: Vector[Vertex[A]], i: Int, j: Int): Vector[Vertex[A]] =
     vs updated(i,combine(vs(i),vs(j))) map { Vertex.replace(_, vs(j).a, vs(i).a) } filter { _.a != vs(j).a }
+
   def contractEs[A](es: Vector[Edge[A]], vs: Vector[Vertex[A]], i: Int, j: Int): Vector[Edge[A]] =
     es map { Edge.replace(_,vs(j).a,vs(i).a) } filter { { case Edge(a,b) => a != b } }
 
+  // utility
   def sizes[A](g: Graph[A]): (Int,Int) = (g.vs.size, g.es.size)
   def size[A](g: Graph[A]): Int = sizes(g) match { case(m,n) => m+n }
-
   def findV[A](g: Graph[A], a: A): Option[Vertex[A]] = g.vs find { _.a == a }
   def hasE[A](g: Graph[A], e: Edge[A]): Boolean = g.es contains { e }
 
