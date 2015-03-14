@@ -30,23 +30,18 @@ object Graph {
     @tailrec
     def rContractMany(n: Int, min: Int): Int = {
       if (n == 0) min
-      else {
-        val maybeMin = rContractOne(g)
-        rContractMany(n-1, math.min(min,maybeMin)) } }
+      else rContractMany(n-1, math.min(min,rContractOne(g))) }
     rContractMany(g.ns.size, g.ns(0).adj.size) }
 
-  private def rContractOne[A](g: Graph[A]): Int = {
-    if(g.ns.size == 2) math.min(g.ns(0).adj.size,g.ns(1).adj.size)
-    else {
-      val(i,j) = rIndices(g)
-      val gg = contract(g,i,j)
-      rContractOne(gg) } }
+  private def rContractOne[A](g: Graph[A]): Int = //{
+    if (g.ns.size == 2) g.ns.head.adj.size
+    else rIndices(g) match { case(i,j) => rContractOne(contract(g,i,j)) }
 
   private def rIndices[A](g: Graph[A]): (Int,Int) = {
     val i = rand(g.ns.size)
     val adj = g.ns(i).adj
-    val k = findIndex(g,adj(rand(adj.size)))
-    (i, k) }
+    val j = findIndex(g,adj(rand(adj.size)))
+    (i, j) }
 
   private def rand(i: Int): Int = (math.random * i).toInt
 
