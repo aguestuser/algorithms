@@ -8,103 +8,72 @@ import scala.annotation.tailrec
  * License: GPLv2
  */
 
-//case class Node[A](item: A, adj: => collection.mutable.Set[Node[A]])
-//case class Edge[A](src: Node[A], trg: Node[A])
-//
-//class Graph[A]{
-//  var ns = Vector[Node[A]]()
-//  var es = Vector[Edge[A]]()
-//
-//  def add(item: A): Graph[A] = {
-//    ns = ns :+ Node(item,collection.mutable.Set[Node[A]]())
-//    this
-//  }
-//  def connect(ui: Int, vi: Int): Graph[A] = {
-//    ns(ui).adj += ns(vi)
-//    ns(vi).adj += ns(ui)
-//    es = es :+ Edge(ns(ui),ns(vi))
-//    this
-//  }
-//}
-
-class Node[A](val value: A) { var adj = List[Node[A]]() }
-class Graph[A](var ns: Vector[Node[A]] = Vector()) {
-
-  def addNode(value: A): Graph[A] = {
-    ns = ns :+ new Node(value)
-    this }
-
-  def addNodes(values: List[A]): Graph[A] = {
-    values map { addNode }
-    this }
-
-  def connect(i: Int, j: Int): Graph[A] = {
-    val (n,o) = (ns(i),ns(j))
-    n.adj = o :: n.adj
-    this }
-
-  def connectMany(indices: List[(Int,Int)]): Graph[A] = {
-    indices map { case(i,j) => connect(i,j) }
-    this }
-
-  def disconnect(i: Int, j: Int): Graph[A] = {
-    val (n,o) = (ns(i),ns(j))
-    n.adj = n.adj filter { _ != o }
-    o.adj = o.adj filter { _ != n }
-    this }
-
-  def contract(i: Int, j: Int): Graph[A] = {
-    val (ni,nj) = (ns(i), ns(j))
-    ni.adj = ni.adj.filter(_ != nj) ++ nj.adj.filter(_ != ni)
-    ns = ns filter { _ != nj }
-    this }
-
-  def minCut: Int = {
-
-    @tailrec
-    def rContractMany(n: Int, min: Int): Int = {
-      println(s"left: $n | cur min: $min")
-      if (n == 0) min
-      else rContractMany(n-1, math.min(min,rContract(
-        new Graph[A]
-          .addNodes(ns.toList.map(_.value))
-          .connectMany(ns.toList flatMap { n => n.adj map { o => (ns.indexOf(n),ns.indexOf(o)) } })))) }
-
-    def rContract(g: Graph[A]): Int = {
-//      println(s"g.ns.size: ${g.ns.head.adj.size}")
-      if (g.ns.size <= 2) g.ns.head.adj.size
-      else { (g.contract _).tupled(rIndices(g)); rContract(g) } }
-    def rIndices(g: Graph[A]): (Int,Int) = {
-      val (a,b) = (rIndex(g),rIndex(g))
-      if (a != b) (a,b) else rIndices(g) }
-    def rIndex(g: Graph[A]): Int = (math.random * g.ns.size).toInt
-
-    val x = ns.size
-    rContractMany(x * x * math.log(x).toInt, ns.head.adj.size)
-  }
-
-//  def edges: Int = {
-////    val ees = ns flatMap { n => n.adj map { nn => (n,nn) } }
-//    ( 0 /: ns )((es,n) =>
-//      n.adj map { o => if  }
-//    )
-//  }
-
-}
+case class Node[A](v: A, adj: List[A])
+case class Graph[A](ns: Vector[Node[A]])
 
 object Graph {
-  def parseTxt(path: String): Graph[Int] = {
-    val lines: List[String] = io.Source.fromFile(path).getLines().toList
-    val adjLists: List[List[Int]] = lines map { _.split("""[\t|\s]+""").toList.map(_.toInt) }
-    val nodes: List[Int] = adjLists map { _.head }
-    val indexLists: List[List[Int]] = adjLists map { al => al map { nv => nodes.indexOf(nv) } }
-    val edges: List[(Int,Int)] = indexLists flatMap { case(hd::tl) => tl map { i => (hd,i) } }
 
-    new Graph[Int].addNodes(nodes).connectMany(edges)
-  }
+  def findIndex[A](g: Graph[A], v: A): Int = nodeIndex(g,findNode(g,v).get)
+  def findNode[A](g: Graph[A], v: A): Option[Node[A]] = g.ns.find(_.v == v)
+  def nodeIndex[A](g: Graph[A], n: Node[A]): Int = g.ns.indexOf(n)
+
+  def connect[A](g: Graph[A], i: Int, j: Int): Graph[A] = {
+    val (ni,nj) = (g.ns(i),g.ns(j))
+    Graph(g.ns
+      .updated(i,Node(ni.v, nj.v :: ni.adj))
+      .updated(j,Node(nj.v, ni.v :: nj.adj)))}
+
+  def connectMany[A](g: Graph[A], indices: List[(Int,Int)]): Graph[A] = {
+    (g /: indices)({case(gg,(i,j)) => connect(gg,i,j)})}
+
+  def minCut[A](g: Graph[A]): Int = {
+    @tailrec
+    def rContractMany(n: Int, min: Int): Int = {
+      if (n == 0) min
+      else {
+        val maybeMin = rContractOne(g)
+        rContractMany(n-1, math.min(min,maybeMin)) } }
+    rContractMany(g.ns.size, g.ns(0).adj.size) }
+
+  private def rContractOne[A](g: Graph[A]): Int = {
+    if(g.ns.size == 2) math.min(g.ns(0).adj.size,g.ns(1).adj.size)
+    else {
+      val(i,j) = rIndices(g)
+      val gg = contract(g,i,j)
+      rContractOne(gg) } }
+
+  private def rIndices[A](g: Graph[A]): (Int,Int) = {
+    val i = rand(g.ns.size)
+    val adj = g.ns(i).adj
+    val k = findIndex(g,adj(rand(adj.size)))
+    (i, k) }
+
+  private def rand(i: Int): Int = (math.random * i).toInt
+
+  def contract[A](g: Graph[A], i: Int, j: Int): Graph[A] = {
+    if (i == j) g // can't contract a node on itself
+    else {
+      val (ni,nj) = (g.ns(i),g.ns(j))
+      Graph(g.ns
+        .updated(i,Node.combine(ni,nj))
+        .filter(_ != nj)
+        .map(Node.replace(_,nj.v,ni.v))) } }
+
+  def parseTxt(path: String): Graph[Int] = {
+    val lines = io.Source.fromFile(path).getLines().toVector
+    val keyLists = lines map { _.split("""[\t|\s]+""").toList }
+    val ns = keyLists map { kl => Node(kl.head.toInt, kl.tail.map(_.toInt)) }
+    Graph(ns) }
 }
 
-//
-//
-//
-//class Edge{}
+object Node {
+
+  def combine[A](n: Node[A], m: Node[A]): Node[A] =
+    Node(n.v, n.adj.filter(_ != m.v) ::: m.adj.filter(_ != n.v))
+
+  def replace[A](n: Node[A], targ: A, repl: A): Node[A] = n match {
+    case Node(v,a) =>
+      val vv = if (v == targ) repl else v
+      val aa = a map { vvv => if (vvv == targ) repl else vvv }
+      Node(vv,aa) }
+}
