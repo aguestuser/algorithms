@@ -11,11 +11,13 @@ import scala.annotation.tailrec
 case class Node[A](v: A, adj: List[A])
 case class Graph[A](ns: Vector[Node[A]])
 
+
+
 object Graph {
 
-  def findIndex[A](g: Graph[A], v: A): Int = nodeIndex(g,findNode(g,v).get) // O(n) where n is # nodes
-  def nodeIndex[A](g: Graph[A], n: Node[A]): Int = g.ns.indexOf(n) // O(n) where n is # nodes
-  def findNode[A](g: Graph[A], v: A): Option[Node[A]] = g.ns.find(_.v == v) // O(n) where in is # nodes
+  def findIndex[A](g: Graph[A], v: A): Int = g.ns.zipWithIndex.find({ case(n,i) ⇒ n.v == v}).get._2 // O(n) where in is # nodes
+  def adjIndices[A](g: Graph[A], i: Int): List[Int] = g.ns(i).adj.map(n ⇒ findIndex(g,n)) // O(n*m)
+  def adjEdges[A](g: Graph[A], i: Int): List[(Int,Int)] = adjIndices(g,i) map { (i,_) } // O(n*m)
 
   def connect[A](g: Graph[A], i: Int, j: Int): Graph[A] = { // O(1)
     val (ni,nj) = (g.ns(i),g.ns(j))
@@ -26,38 +28,38 @@ object Graph {
   def connectMany[A](g: Graph[A], indices: List[(Int,Int)]): Graph[A] = { // O(n) where n is indices.size
     (g /: indices)({case(gg,(i,j)) => connect(gg,i,j)})}
 
-  def minCut[A](g: Graph[A]): Int = { // O(n^3*m) where n is # of nodes, m is # edges
+  def minCut[A](g: Graph[A]): Int = { // O(n^3 * m) where n is # nodes, m is # edges; m = n^2 in worst case so O(n^5)
     @tailrec
     def rContractMany(n: Int, min: Int): Int = {
       if (n == 0) min
-      else rContractMany(n-1, math.min(min,rContractOne(g))) } // O(n^2*m) where n is # nodes, m is # edges [runs n times]
+      else rContractMany(n-1, math.min(min,rContractOne(g))) } // O(n^2 * m) where n is # nodes, m is # edges [runs n times]
     rContractMany(g.ns.size, g.ns(0).adj.size) }
 
-  private def rContractOne[A](g: Graph[A]): Int = //{ O(n^2*m) where n is g.ns.size, m is max size of any node's adj list
+  private def rContractOne[A](g: Graph[A]): Int = //{ O(n^2 * m) where n is g.ns.size, m is max size of any node's adj list
     if (g.ns.size == 2) g.ns.head.adj.size
-    else rIndices(g) match { case(i,j) => rContractOne(contract(g,i,j)) } // O(n*m)
+    else rIndices(g) match { case(i,j) ⇒ rContractOne(contract(g,i,j)) } // O(n*m)
 
-  private def rIndices[A](g: Graph[A]): (Int,Int) = { // O(n) where is is g.ns.size
+  private def rIndices[A](g: Graph[A]): (Int,Int) = { // O(n^2) where is is g.ns.size
     val i = rand(g.ns.size) // O(1)
     val adj = g.ns(i).adj // O(1)
-    val j = findIndex(g,adj(rand(adj.size))) // O(n) where n is g.ns.size
+    val j = findIndex(g,adj(rand(adj.size))) // O(n^2) where n is g.ns.size
     (i, j) }
 
   private def rand(i: Int): Int = (math.random * i).toInt // O(1)
 
-  def contract[A](g: Graph[A], i: Int, j: Int): Graph[A] = { // O(n*m) where n is # nodes, m is # of edges
+  def contract[A](g: Graph[A], i: Int, j: Int): Graph[A] = { // O(n + m) where n is # nodes, m is # of edges
     if (i == j) g // can't contract a node on itself
     else {
       val (ni,nj) = (g.ns(i),g.ns(j)) // O(1)
       Graph(g.ns
-        .updated(i,Node.combine(ni,nj)) // O(m) where i is # of ni.adj.size + nj.adj.size
+        .updated(i,Node.combine(ni,nj)) // O(k) where k is # of ni.adj.size + nj.adj.size
         .filter(_ != nj) // O(n) where n is g.ns.size
-        .map(Node.replace(_,nj.v,ni.v))) } } // O(n*m) where n is g.ns.size, m is # of edges in any node
+        .map(Node.replace(_,nj.v,ni.v))) } } // O(n + m) where n is g.ns.size, m is # of edges
 
   def parseTxt(path: String): Graph[Int] = {
     val lines = io.Source.fromFile(path).getLines().toVector
     val keyLists = lines map { _.split("""[\t|\s]+""").toList }
-    val ns = keyLists map { kl => Node(kl.head.toInt, kl.tail.map(_.toInt)) }
+    val ns = keyLists map { kl ⇒ Node(kl.head.toInt, kl.tail.map(_.toInt)) }
     Graph(ns) }
 }
 
