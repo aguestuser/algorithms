@@ -1,4 +1,4 @@
-package algos.graph.imperative
+package algos.graph.imperative.vector
 
 import org.specs2.mutable.Specification
 import org.specs2.specification.Scope
@@ -8,13 +8,8 @@ import org.specs2.specification.Scope
  * Date: 4/7/15
  */
 
-trait SampleNodes extends Scope {
-  
-  lazy val (n0,n1,n2,n3) = (new Node(0), new Node(1), new Node(2), new Node(3))
-  lazy val nodes = Vector(n0,n1,n2,n3)
-}
 
-class GraphTest extends Specification {
+class Graph$Test extends Specification {
 
   "Graph object" should {
 
@@ -103,9 +98,12 @@ class GraphTest extends Specification {
       g2.nodes(1).adj === Set(n2)
 
     }
-
-
-
   }
-
 }
+
+trait SampleNodes extends Scope {
+
+  lazy val (n0,n1,n2,n3) = (new Node(0), new Node(1), new Node(2), new Node(3))
+  lazy val nodes = Vector(n0,n1,n2,n3)
+}
+

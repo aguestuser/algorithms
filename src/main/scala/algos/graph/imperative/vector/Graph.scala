@@ -1,5 +1,4 @@
-package algos.graph.imperative
-
+package algos.graph.imperative.vector
 
 /**
  * Author: @aguestuser
