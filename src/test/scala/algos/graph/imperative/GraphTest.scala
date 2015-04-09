@@ -27,6 +27,24 @@ class GraphTest extends Specification {
 
     }
 
+    "add a node" >> new SampleNodes {
+
+      lazy val g = Graph.add(Graph(nodes), new Node(4))
+
+      g.nodes.size === 5
+      g.nodes(4).item === 4
+
+    }
+
+    "remove a node" >> new SampleNodes {
+
+      val g = Graph.remove(Graph(nodes), n0)
+
+      g.nodes.size === 3
+      g.nodes.head === n1
+
+    }
+
     "connect an edge" >> new SampleNodes {
 
       lazy val g = Graph.connect(Graph(nodes),Edge(n0,n1))
@@ -76,14 +94,17 @@ class GraphTest extends Specification {
 
     }
 
-    "remove a node" >> new SampleNodes {
+    "disconnect an edge" >> new SampleNodes {
 
-      val g = Graph.remove(Graph(nodes), n0)
+      val g1 = Graph.connectMany(Graph(nodes), List(Edge(n0,n1),Edge(n0,n2),Edge(n1,n2)))
+      val g2 = Graph.disconnect(Graph(nodes),Edge(n0,n1))
 
-      g.nodes.size === 3
-      g.nodes.head === n1
+      g2.nodes.head.adj === Set(n2)
+      g2.nodes(1).adj === Set(n2)
 
     }
+
+
 
   }
 
