@@ -1,4 +1,4 @@
-package algos.graph
+package algos.graph.bad
 
 import scala.annotation.tailrec
 
@@ -10,7 +10,6 @@ import scala.annotation.tailrec
 
 case class Node[A](v: A, adj: List[A])
 case class Graph[A](ns: Vector[Node[A]])
-
 
 
 object Graph {

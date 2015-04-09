@@ -1,7 +1,6 @@
-package algos.graph
+package algos.graph.bad
 
-import Graph._
-
+import algos.graph.bad.Graph._
 import org.specs2.mutable.Specification
 
 /**

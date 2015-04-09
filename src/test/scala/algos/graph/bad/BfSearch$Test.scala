@@ -1,6 +1,6 @@
-package algos.graph
+package algos.graph.bad
 
-import algos.graph.BfSearch._
+import algos.graph.bad.BfSearch._
 import org.specs2.mutable.Specification
 
 /**
