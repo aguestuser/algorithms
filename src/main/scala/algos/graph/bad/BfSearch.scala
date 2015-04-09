@@ -26,10 +26,6 @@ object BfSearch {
     bfSearch(g, BfAcc(Queue(from),Set(from),Dist(Map((from,0))))).res match {
       case Dist(ds) ⇒ ds(to) }
 
-//  def bfSortByHops[A](g: Graph[A], in: Int): Map[Int,Node[A]] =
-//    bfSearch(g, BfAcc(Queue(in),Set(in),Dist(Map((in,0))))).res match {
-//      case HopMap(ds,hs) ⇒ hs
-//    }
 
   @tailrec
   private def bfSearch[A](g: Graph[A], acc: BfAcc[A]): BfAcc[A] = acc match {

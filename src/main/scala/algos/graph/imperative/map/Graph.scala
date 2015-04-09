@@ -5,18 +5,18 @@ package algos.graph.imperative.map
  * Date: 4/9/15
  */
 
-case class Graph[A](nodes: Map[Node[A],Node[A]])
+case class Graph[A](nodes: Map[A,Node[A]])
 
 object Graph {
 
   def add[A](g: Graph[A], n: Node[A]): Graph[A] = // O(1)
-    Graph(g.nodes + (n → n))
+    Graph(g.nodes + (n.item → n))
 
   def addMany[A](g: Graph[A], ns: List[Node[A]]): Graph[A] = // O(k) where k is # nodes being added
-    Graph(g.nodes ++  ns.map { n ⇒ n → n } )
+    Graph(g.nodes ++  ns.map { n ⇒ n.item → n } )
 
   def remove[A](g: Graph[A], n: Node[A]): Graph[A] = { // O(1)
-    val ns = g.nodes - n
+  val ns = g.nodes - n.item
     ns.values foreach { _.disconnect(n) }
     Graph(ns) }
 
@@ -24,8 +24,8 @@ object Graph {
     (g /: ns)((gg,n) ⇒ remove(gg,n)) }
 
   def connect[A](g: Graph[A], e: Edge[A]): Graph[A] = { // O(1)
-    g.nodes(e.n1).connect(e.n2)
-    g.nodes(e.n2).connect(e.n1)
+    g.nodes(e.n1.item).connect(e.n2)
+    g.nodes(e.n2.item).connect(e.n1)
     g }
 
   def connectMany[A](g: Graph[A], es: List[Edge[A]]): Graph[A] = { // O(1)
@@ -33,8 +33,8 @@ object Graph {
     g }
 
   def disconnect[A](g: Graph[A], e: Edge[A]): Graph[A] = {
-    g.nodes(e.n1).disconnect(e.n2)
-    g.nodes(e.n2).disconnect(e.n1)
+    e.n1.disconnect(e.n2)
+    e.n2.disconnect(e.n1)
     g }
 
   def disconnectMany[A](g: Graph[A], es: List[Edge[A]]): Graph[A] = {

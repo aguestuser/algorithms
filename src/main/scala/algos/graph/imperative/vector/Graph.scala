@@ -23,8 +23,11 @@ object Graph {
   def removeMany[A](g: Graph[A], ns: List[Node[A]]): Graph[A] = // O(k*n) where k is number of nodes being removed, n is # nodes in graph
     (g /: ns)((gg,n) ⇒ remove(gg,n))
 
-  def connect[A](g: Graph[A], e: Edge[A]): Graph[A] =  // O(n) where n is nodes.size
+  def connect[A](g: Graph[A], e: Edge[A]): Graph[A] = {
+    // O(n) where n is nodes.size
+   println("HMMM...")
     connectByIndex(g, g.nodes.indexOf(e.n1), g.nodes.indexOf(e.n2))
+  }
 
   def connectByIndex[A](g: Graph[A], i: Int, j: Int): Graph[A] = // O(1)
     Graph(g.nodes

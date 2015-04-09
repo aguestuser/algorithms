@@ -11,6 +11,13 @@ import org.specs2.specification.Scope
 
 class Graph$Test extends Specification {
 
+  trait SampleNodes extends Scope {
+
+    lazy val (n0,n1,n2,n3) = (new Node(0), new Node(1), new Node(2), new Node(3))
+    lazy val nodes = Vector(n0,n1,n2,n3)
+  }
+
+
   "Graph object" should {
 
     "construct a graph" >> new SampleNodes {
@@ -101,9 +108,4 @@ class Graph$Test extends Specification {
   }
 }
 
-trait SampleNodes extends Scope {
-
-  lazy val (n0,n1,n2,n3) = (new Node(0), new Node(1), new Node(2), new Node(3))
-  lazy val nodes = Vector(n0,n1,n2,n3)
-}
 

@@ -23,6 +23,7 @@ class BfSearch$Test extends Specification {
         Node(5,List(3,4,6,7)),
         Node(6,List(4,5,7)),
         Node(7,List(4,5,6))))
+
     /*
     *
     *  0 -- 1
