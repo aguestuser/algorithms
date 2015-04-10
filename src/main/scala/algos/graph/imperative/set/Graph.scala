@@ -51,6 +51,7 @@ object Graph {
 class Node[A](val item: A, var adj: Set[Node[A]] = Set[Node[A]]()) {
 
   def connect(n: Node[A]): Node[A] = { this.adj = this.adj + n; this } // O(1)
+  def connectMany(ns: List[Node[A]]): Node[A] = (this /: ns)(_.connect(_))
   def disconnect(n: Node[A]): Node[A] = { this.adj = this.adj - n; this } // O(1)
 
 }

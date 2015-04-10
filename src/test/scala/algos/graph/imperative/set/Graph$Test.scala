@@ -88,6 +88,15 @@ class Graph$Test extends Specification {
       n0.adj === Set(n1,n2)
     }
 
+    "connect many edges directly" >> new SampleNodes {
+
+      val g = Graph(nodes)
+      n0.connectMany(List(n1,n2))
+
+      n0.adj === Set(n1,n2)
+
+    }
+
     "not connect a node to a node that isn't in the graph" >> new SampleNodes {
 
       val fakeNode = new Node(666)
