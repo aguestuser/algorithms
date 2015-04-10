@@ -8,7 +8,6 @@ import scala.collection.immutable.Queue
  * Date: 4/9/15
  */
 
-
 case class BfAcc[A](explorers: Queue[Node[A]], res: BfRes[A])
 
 sealed trait BfRes[A]
@@ -29,8 +28,8 @@ object BfSearch {
 
   def shortestPath[A](g: Graph[A], from: Node[A], to: Node[A]): Int = {
     init(g,from)
-    search(g, BfAcc[A](Queue(from), BfDist(Map(from → 0))))
-      .res match { case BfDist(ds) ⇒ ds(to) } }
+    search(g, BfAcc[A](Queue(from), BfDist(Map(from → 0)))).res match {
+      case BfDist(ds) ⇒ ds(to) } }
 
   def connectedComponents[A](g: Graph[A]): Set[Set[Node[A]]] = {
     init(g)
@@ -45,28 +44,17 @@ object BfSearch {
   private def init[A](start: Node[A]): Unit = start.explored = true
 
   @tailrec
-  private def search[A](g: Graph[A], acc: BfAcc[A]): BfAcc[A] = acc match {
-    // O(n+e) where n is # nodes, e is # of edges because:
-      // n limits the # of nodes that get put in the `explorers` queue
-      // e limits the total # of times that `remember` gets called
+  private def search[A](g: Graph[A], acc: BfAcc[A]): BfAcc[A] = acc match { // O(n+e) where n is # nodes, e is # of edges
     case BfAcc(Queue(), _) ⇒ acc
     case BfAcc(exrs,r) ⇒
       val (n,exrs_) = exrs.dequeue // O(1)
-      val acc_ = (BfAcc(exrs_,r) /: n.adj)(remember(g,n)(_,_)) // O(a) where a is # of adjacent nodes
-      search(g,acc_) }
+      search(g,(BfAcc(exrs_,r) /: n.adj)(remember(g,n)(_,_))) }
 
   private def remember[A](g: Graph[A], n1: Node[A])(acc: BfAcc[A], n2: Node[A]): BfAcc[A] = { // O(1)
     if (n2.explored) acc
-    else {
-      n2.explored = true
-      BfAcc(
-        acc.explorers.enqueue(n2),
-        acc.res match {
-          case BfPath(p) ⇒ rememberPath(g,n2, p)
-          case BfDist(ds) ⇒ rememberDist(g,n1,n2,ds) } ) } }
+    else { n2.explored = true; BfAcc(acc.explorers.enqueue(n2), newResult(g,n1,n2,acc.res)) } }
 
-
-  private def rememberPath[A](g: Graph[A], n: Node[A], path: List[Node[A]]): BfPath[A] = BfPath(n :: path) // O(1)
-  private def rememberDist[A](g: Graph[A], n1: Node[A], n2: Node[A], ds: Map[Node[A],Int]): BfDist[A] = BfDist(ds + ((n2,ds(n1) + 1))) // O(1)
-
+  private def newResult[A](g: Graph[A], n1: Node[A], n2: Node[A], r: BfRes[A]): BfRes[A] = r match {
+    case BfPath(p) ⇒ BfPath(n2 :: p)
+    case BfDist(ds) ⇒ BfDist(ds + ((n2, ds(n1) + 1))) }
 }

@@ -84,8 +84,7 @@ class BfSearch$Test extends Specification {
 
       val g2 = Graph.disconnect(g,Edge(ns(3),ns(5)))
 
-      val res = BfSearch.connectedComponents(g2)
-      res ===
+      BfSearch.connectedComponents(g2) ===
         Set(
           Set(ns(4), ns(5), ns(6), ns(7)), // WRONG! (should have ns(6)
           Set(ns(1), ns(2), ns(3), ns(0)))
