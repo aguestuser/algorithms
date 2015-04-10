@@ -47,8 +47,9 @@ class BfSearch$Test extends Specification {
 
     "explore all nodes connected to a starting node" >> new SampleGraph {
 
-      BfSearch.bfExplore(g,ns(0)) ===
+      BfSearch.explore(g,ns(0)) ===
         List(
+          ns(0),
           ns(1),
           ns(2),
           ns(3),
@@ -57,8 +58,9 @@ class BfSearch$Test extends Specification {
           ns(6),
           ns(7))
 
-      BfSearch.bfExplore(g,ns(5)) ===
+      BfSearch.explore(g,ns(5)) ===
         List(
+          ns(5),
           ns(3),
           ns(4),
           ns(6),
@@ -71,9 +73,33 @@ class BfSearch$Test extends Specification {
 
     "find the shortest path between two nodes" >> new SampleGraph {
 
-      BfSearch.bfShortestPath(g,ns(2),ns(6)) === 3
-      BfSearch.bfShortestPath(g,ns(3),ns(5)) === 1
-      BfSearch.bfShortestPath(g,ns(0),ns(7)) === 3
+      BfSearch.shortestPath(g,ns(2),ns(6)) === 3
+      BfSearch.shortestPath(g,ns(3),ns(5)) === 1
+      BfSearch.shortestPath(g,ns(0),ns(7)) === 3
+      BfSearch.shortestPath(g,ns(1),ns(1)) === 0
+
+    }
+
+    "find the connected components in a graph" >> new SampleGraph {
+
+      val g2 = Graph.disconnect(g,Edge(ns(3),ns(5)))
+
+      val res = BfSearch.connectedComponents(g2)
+      res ===
+        Set(
+          Set(ns(4), ns(5), ns(6), ns(7)), // WRONG! (should have ns(6)
+          Set(ns(1), ns(2), ns(3), ns(0)))
+
+    }
+
+    "generate a map of hops from a start point" >> new SampleGraph {
+
+      BfSearch.mapHops(g,ns(0)) ===
+        Map(
+          0 → Set(ns(0)),
+          1 → Set(ns(1),ns(2),ns(3)),
+          2 → Set(ns(5)),
+          3 → Set(ns(4),ns(6),ns(7)))
 
     }
 

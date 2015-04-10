@@ -48,7 +48,7 @@ object Graph {
     (true /: ns)( _ && g.nodes.contains(_))
 }
 
-class Node[A](val item: A, var adj: Set[Node[A]] = Set[Node[A]]()) {
+class Node[A](val item: A, var adj: Set[Node[A]] = Set[Node[A]](), var explored: Boolean = false) {
 
   def connect(n: Node[A]): Node[A] = { this.adj = this.adj + n; this } // O(1)
   def connectMany(ns: List[Node[A]]): Node[A] = (this /: ns)(_.connect(_))
