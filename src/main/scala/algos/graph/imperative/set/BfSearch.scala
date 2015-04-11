@@ -1,6 +1,5 @@
 package algos.graph.imperative.set
 
-import scala.annotation.tailrec
 import scala.collection.immutable.Queue
 
 /**
@@ -16,45 +15,54 @@ case class BfDist[A](d: Map[Node[A],Int]) extends BfRes[A]
 
 object BfSearch {
 
+  //meta-functions
+
   def explore[A](g: Graph[A], start: Node[A]): List[Node[A]] = {
     init(g,start)
-    search(g, BfAcc[A](Queue(start), BfPath(List(start)))).res match {
+    search(BfAcc[A](Queue(start), BfPath(List(start)))).res match {
       case BfPath(p) ⇒ p.reverse } }
 
   def mapHops[A](g: Graph[A], start: Node[A]): Map[Int,Iterable[Node[A]]] = {
     init(g,start)
-    search(g, BfAcc[A](Queue(start), BfDist(Map(start → 0)))).res match {
+    search(BfAcc[A](Queue(start), BfDist(Map(start → 0)))).res match {
       case BfDist(d) ⇒ d.keys.groupBy(d(_)) } }
 
   def shortestPath[A](g: Graph[A], from: Node[A], to: Node[A]): Int = {
     init(g,from)
-    search(g, BfAcc[A](Queue(from), BfDist(Map(from → 0)))).res match {
+    search(BfAcc[A](Queue(from), BfDist(Map(from → 0)))).res match {
       case BfDist(ds) ⇒ ds(to) } }
 
   def connectedComponents[A](g: Graph[A]): Set[Set[Node[A]]] = {
     init(g)
-    g.nodes map { n ⇒
-      init(n)
-      search(g, BfAcc[A](Queue(n), BfPath(List(n)))).res match {
-        case BfPath(p) ⇒ p.toSet }
-    } filter { _.size > 1 } }
+    g.nodes map { connectedComponent } filter { _.size > 1 } }
+
+  def connectedComponent[A](n: Node[A]): Set[Node[A]] = {
+    init(n)
+    search(BfAcc[A](Queue(n), BfPath(List(n)))).res match {
+      case BfPath(p) ⇒ p.toSet } }
 
   private def init[A](g: Graph[A], start: Node[A]): Unit = { init(g); init(start) }
   private def init[A](g: Graph[A]): Unit =  g.nodes foreach { _.explored = false }
   private def init[A](start: Node[A]): Unit = start.explored = true
 
-  @tailrec
-  private def search[A](g: Graph[A], acc: BfAcc[A]): BfAcc[A] = acc match { // O(n+e) where n is # nodes, e is # of edges
+  //core functions
+
+  private def search[A](acc: BfAcc[A]): BfAcc[A] = acc match { // O(n+e) where n is # nodes, e is # of edges
     case BfAcc(Queue(), _) ⇒ acc
     case BfAcc(exrs,r) ⇒
       val (n,exrs_) = exrs.dequeue // O(1)
-      search(g,(BfAcc(exrs_,r) /: n.adj)(remember(g,n)(_,_))) }
+      search((BfAcc(exrs_,r) /: n.adj)(examine(n)(_,_))) }
 
-  private def remember[A](g: Graph[A], n1: Node[A])(acc: BfAcc[A], n2: Node[A]): BfAcc[A] = { // O(1)
+  private def examine[A](n1: Node[A])(acc: BfAcc[A], n2: Node[A]): BfAcc[A] = { // O(1)
     if (n2.explored) acc
-    else { n2.explored = true; BfAcc(acc.explorers.enqueue(n2), newResult(g,n1,n2,acc.res)) } }
+    else {
+      n2.explored = true
+      record(n1,n2,acc) } }
 
-  private def newResult[A](g: Graph[A], n1: Node[A], n2: Node[A], r: BfRes[A]): BfRes[A] = r match {
-    case BfPath(p) ⇒ BfPath(n2 :: p)
-    case BfDist(ds) ⇒ BfDist(ds + ((n2, ds(n1) + 1))) }
+  private def record[A](n1: Node[A], n2: Node[A], acc: BfAcc[A]): BfAcc[A] = {
+    val res = acc.res match {
+      case BfPath(p) ⇒ BfPath(n2 :: p)
+      case BfDist(ds) ⇒ BfDist(ds + ((n2, ds(n1) + 1))) }
+    BfAcc(acc.explorers.enqueue(n2),res) }
+
 }
